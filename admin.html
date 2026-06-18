@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админ · Бонусная карта</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app admin-page">
+    <header class="admin-header">
+      <div class="brand">
+        <img class="brand-logo" src="logo.png" alt="ИНП" />
+        <div>
+          <h1>Администрирование</h1>
+          <p>Управление бонусными картами</p>
+        </div>
+      </div>
+
+      <a class="admin-link" href="index.html">К клиентскому входу</a>
+    </header>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h3>Привязка существующей карты</h3>
+      </div>
+
+      <form class="admin-form" id="adminBindCardForm">
+        <input id="adminPagePhoneInput" type="tel" placeholder="Телефон клиента" />
+        <input id="adminPageCardInput" type="text" placeholder="Номер карты" />
+        <button type="submit">Привязать</button>
+      </form>
+
+      <p class="form-message" id="adminPageMessage"></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <h3>Тестовые клиенты</h3>
+      </div>
+    <div class="admin-search">
+    <input id="adminSearchInput" type="tel" placeholder="Поиск по телефону" />
+    <button id="adminSearchButton" type="button">Найти</button>
+    <button id="adminResetSearchButton" type="button" class="ghost-button">Сбросить</button>
+    </div>
+
+    <p class="form-message" id="adminSearchMessage"></p>
+
+      <div class="admin-clients" id="adminClientsList"></div>
+    </section>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
