@@ -422,11 +422,11 @@ button:hover {
   }
 
   .balance-grid,
-.admin-form,
-.card-info
-.admin-search {
-  grid-template-columns: 1fr;
-}
+  .admin-form,
+  .card-info,
+  .admin-search {
+    grid-template-columns: 1fr;
+  }
 
   .bonus-card h3 {
     font-size: 26px;
