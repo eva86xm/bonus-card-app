@@ -23,7 +23,7 @@
         <p>Бонусная и топливная карта</p>
       </div>
     </div>
-    
+
       <form class="login-form" id="loginForm">
   <div id="phoneStep">
     <label for="phoneInput">Телефон</label>
@@ -105,28 +105,15 @@
       </section>
 
       <section class="panel">
-        <div class="panel-header">
-          <h3>История операций</h3>
-        </div>
-        <div class="transactions" id="transactionsList"></div>
-      </section>
+  <div class="panel-header">
+    <h3>История операций</h3>
+  </div>
+  <div class="transactions" id="transactionsList"></div>
+</section>
 
-      <section class="panel admin-panel">
-        <div class="panel-header">
-          <h3>Админ: привязка карты</h3>
-        </div>
+</section>
 
-        <form class="admin-form" id="bindCardForm">
-          <input id="adminPhoneInput" type="tel" placeholder="Телефон клиента" />
-          <input id="adminCardInput" type="text" placeholder="Номер карты" />
-          <button type="submit">Привязать</button>
-        </form>
-
-        <p class="hint" id="adminMessage"></p>
-      </section>
-    </section>
-
-    <div class="qr-modal hidden" id="qrModal">
+<div class="qr-modal hidden" id="qrModal">
   <div class="qr-modal-content">
     <button type="button" class="qr-modal-close" id="qrModalClose">Закрыть</button>
     <div class="qr-modal-box" id="qrModalBox"></div>

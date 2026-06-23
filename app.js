@@ -23,11 +23,6 @@ const qrModalBox = document.querySelector('#qrModalBox');
 const qrModalClose = document.querySelector('#qrModalClose');
 const transactionsList = document.querySelector('#transactionsList');
 
-const bindCardForm = document.querySelector('#bindCardForm');
-const adminPhoneInput = document.querySelector('#adminPhoneInput');
-const adminCardInput = document.querySelector('#adminCardInput');
-const adminMessage = document.querySelector('#adminMessage');
-
 let currentClient = null;
 let currentQrValue = '';
 
@@ -105,10 +100,6 @@ function showLogin() {
   phoneInput.value = '';
   loginMessage.textContent = '';
 
-  if (adminMessage) {
-    adminMessage.textContent = '';
-  }
-
   showPhoneStep();
 }
 
@@ -117,17 +108,24 @@ function renderTransactions(transactions) {
 
   transactions.forEach(function (transaction) {
     const item = document.createElement('article');
-    item.className = 'transaction';
+    const textBlock = document.createElement('div');
+    const title = document.createElement('p');
+    const meta = document.createElement('p');
+    const points = document.createElement('p');
 
-    item.innerHTML = `
-      <div>
-        <p class="transaction-title">${transaction.title}</p>
-        <p class="transaction-meta">${transaction.date} · ${transaction.place}</p>
-      </div>
-      <p class="transaction-points ${transaction.type}">
-        ${transaction.amount}
-      </p>
-    `;
+    item.className = 'transaction';
+    title.className = 'transaction-title';
+    meta.className = 'transaction-meta';
+    points.className = `transaction-points ${transaction.type}`;
+
+    title.textContent = transaction.title;
+    meta.textContent = `${transaction.date} · ${transaction.place}`;
+    points.textContent = transaction.amount;
+
+    textBlock.appendChild(title);
+    textBlock.appendChild(meta);
+    item.appendChild(textBlock);
+    item.appendChild(points);
 
     transactionsList.appendChild(item);
   });
@@ -186,8 +184,15 @@ async function loadSncDashboard(accessToken) {
   const qrResult = await backendApi.getQrCode(accessToken);
 
   if (!userResult.ok || !ownerResult.ok || !transactionsResult.ok || !qrResult.ok) {
-    showLoginMessage('Не удалось загрузить данные карты');
-    return;
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+
+  dashboard.classList.add('hidden');
+  loginScreen.classList.remove('hidden');
+
+  showPhoneStep();
+  showLoginMessage('Сессия устарела. Войдите еще раз.');
+  return;
   }
 
   const user = userResult.data;
@@ -293,21 +298,6 @@ loginForm.addEventListener('submit', async function (event) {
 
 logoutButton.addEventListener('click', function () {
   showLogin();
-});
-
-bindCardForm.addEventListener('submit', function (event) {
-  event.preventDefault();
-
-  const result = sncApi.bindCardToPhone(
-    adminPhoneInput.value,
-    adminCardInput.value
-  );
-
-  adminMessage.textContent = result.message;
-
-  if (result.ok && currentClient) {
-    showDashboard(currentClient);
-  }
 });
 
 qrBox.addEventListener('click', openQrModal);

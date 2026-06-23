@@ -262,16 +262,6 @@ const mockQrCode = {
 };
 
 async function requestSmsPassword(phone) {
-  return sncRequest('/api/auth/sms-password', {
-    method: 'POST',
-    body: JSON.stringify({
-      phoneNumber: toSncPhone(phone),
-      flags: 2
-    })
-  });
-}
-
-async function requestSmsPassword(phone) {
   if (isMockMode()) {
     return {
       ok: true,
