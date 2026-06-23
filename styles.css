@@ -458,3 +458,130 @@ button:hover {
     font-size: 26px;
   }
 }
+
+@media (max-width: 520px) {
+  body {
+    background: #f3f7fa;
+  }
+
+  .app {
+    padding: 16px 12px;
+  }
+
+  .login-screen,
+  .dashboard {
+    min-height: auto;
+  }
+
+  .dashboard {
+    gap: 14px;
+  }
+
+  .brand {
+    gap: 12px;
+  }
+
+  .brand-logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+  }
+
+  .brand h1 {
+    font-size: 25px;
+    line-height: 1.05;
+  }
+
+  .brand p {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .topbar h2 {
+    font-size: 25px;
+    line-height: 1.1;
+  }
+
+  .ghost-button {
+    padding: 10px 12px;
+    min-width: 82px;
+  }
+
+  .bonus-card {
+    min-height: auto;
+    padding: 18px;
+    border-radius: 14px;
+    gap: 18px;
+  }
+
+  .bonus-card h3 {
+    font-size: 27px;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .card-label {
+    margin-bottom: 12px;
+  }
+
+  .qr-box {
+    width: 132px;
+    height: 132px;
+    border-width: 8px;
+  }
+
+  .qr-box img,
+  .qr-box canvas {
+    width: 116px;
+    height: 116px;
+  }
+
+  .card-info,
+  .balance-grid {
+    gap: 10px;
+  }
+
+  .card-info div,
+  .balance-item,
+  .panel {
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .balance-item strong {
+    font-size: 32px;
+    margin-top: 6px;
+  }
+
+  .panel {
+    gap: 12px;
+  }
+
+  .panel-header h3 {
+    font-size: 20px;
+  }
+
+  .transaction {
+    gap: 10px;
+    padding: 13px;
+  }
+
+  .transaction-title {
+    font-size: 15px;
+  }
+
+  .transaction-meta {
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  .transaction-points {
+    white-space: nowrap;
+    font-size: 15px;
+  }
+}
