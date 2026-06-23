@@ -26,6 +26,38 @@ async function requestSms(req, res, next) {
   }
 }
 
+async function registerCard(req, res, next) {
+  try {
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ error: 'Укажите телефон' });
+    }
+
+    const result = await sncService.registerCard(phone);
+
+    res.status(result.status).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function confirmRegisterCard(req, res, next) {
+  try {
+    const { phone, code } = req.body;
+
+    if (!phone || !code) {
+      return res.status(400).json({ error: 'Укажите телефон и код из SMS' });
+    }
+
+    const result = await sncService.confirmRegisterCard(phone, code);
+
+    res.status(result.status).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function login(req, res, next) {
   try {
     const { username, password } = req.body;
@@ -147,6 +179,8 @@ async function getQrCode(req, res, next) {
 module.exports = {
   ping,
   requestSms,
+  registerCard,
+  confirmRegisterCard,
   login,
   refreshTokens,
   logout,

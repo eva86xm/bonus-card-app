@@ -4,6 +4,13 @@ const requestSmsButton = document.querySelector('#requestSmsButton');
 const smsCodeInput = document.querySelector('#smsCodeInput');
 const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
+const registerStep = document.querySelector('#registerStep');
+const registerPhoneInput = document.querySelector('#registerPhoneInput');
+const registerSmsButton = document.querySelector('#registerSmsButton');
+const registerCodeInput = document.querySelector('#registerCodeInput');
+const confirmRegisterButton = document.querySelector('#confirmRegisterButton');
+const showRegisterButton = document.querySelector('#showRegisterButton');
+const backToLoginButton = document.querySelector('#backToLoginButton');
 const loginMessage = document.querySelector('#loginMessage');
 const loginScreen = document.querySelector('#loginScreen');
 const dashboard = document.querySelector('#dashboard');
@@ -175,6 +182,20 @@ function showSmsStep() {
   showLoginMessage('Введите код из SMS');
 }
 
+function showRegisterStep() {
+  phoneStep.classList.add('hidden');
+  smsStep.classList.add('hidden');
+  registerStep.classList.remove('hidden');
+  showRegisterButton.classList.add('hidden');
+  loginMessage.textContent = '';
+}
+
+function hideRegisterStep() {
+  registerStep.classList.add('hidden');
+  showRegisterButton.classList.remove('hidden');
+  showPhoneStep();
+}
+
 async function loadSncDashboard(accessToken) {
   showLoginMessage('Загружаем данные карты...');
 
@@ -313,6 +334,90 @@ qrModalClose.addEventListener('click', closeQrModal);
 qrModal.addEventListener('click', function (event) {
   if (event.target === qrModal) {
     closeQrModal();
+  }
+});
+
+showRegisterButton.addEventListener('click', function () {
+  showRegisterStep();
+});
+
+backToLoginButton.addEventListener('click', function () {
+  hideRegisterStep();
+});
+
+registerPhoneInput.addEventListener('input', function () {
+  registerPhoneInput.value = formatPhone(registerPhoneInput.value);
+  showLoginMessage('');
+});
+
+registerSmsButton.addEventListener('click', async function () {
+  const phone = registerPhoneInput.value.trim();
+
+  if (!phone) {
+    showLoginMessage('Введите номер телефона');
+    return;
+  }
+
+  const normalizedPhone = sncApi.normalizePhone(phone);
+
+  if (normalizedPhone.length !== 11) {
+    showLoginMessage('Введите полный номер телефона');
+    return;
+  }
+
+  registerSmsButton.disabled = true;
+  registerSmsButton.textContent = 'Отправляем...';
+  showLoginMessage('Отправляем SMS-код для регистрации...');
+
+  try {
+    const result = await backendApi.registerCard(phone);
+
+    if (result.ok) {
+      showLoginMessage('SMS отправлено. Для теста используйте код 123456.');
+      return;
+    }
+
+    const message = result.data?.data || result.data?.error || 'Не удалось отправить SMS';
+    showLoginMessage(message);
+  } catch {
+    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+  } finally {
+    registerSmsButton.disabled = false;
+    registerSmsButton.textContent = 'Получить SMS для регистрации';
+  }
+});
+
+confirmRegisterButton.addEventListener('click', async function () {
+  const phone = registerPhoneInput.value.trim();
+  const code = registerCodeInput.value.trim();
+
+  if (!code) {
+    showLoginMessage('Введите код из SMS');
+    return;
+  }
+
+  confirmRegisterButton.disabled = true;
+  confirmRegisterButton.textContent = 'Регистрируем...';
+  showLoginMessage('Проверяем код и регистрируем карту...');
+
+  try {
+    const result = await backendApi.confirmRegisterCard(phone, code);
+
+    if (!result.ok) {
+      const message = result.data?.data || result.data?.error || 'Не удалось зарегистрировать карту';
+      showLoginMessage(message);
+      return;
+    }
+
+    const cardNumber = result.data?.data?.cardNumber || result.data?.cardNumber || 'номер карты получен';
+
+    showLoginMessage(`Карта зарегистрирована: ${cardNumber}. Теперь можно войти.`);
+    registerCodeInput.value = '';
+  } catch {
+    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+  } finally {
+    confirmRegisterButton.disabled = false;
+    confirmRegisterButton.textContent = 'Зарегистрировать карту';
   }
 });
 

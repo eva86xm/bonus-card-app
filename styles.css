@@ -1228,3 +1228,56 @@ button:hover {
     width: calc(100% - 20px);
   }
 }
+
+#registerStep {
+  display: grid;
+  gap: 12px;
+}
+
+#registerStep.hidden {
+  display: none;
+}
+
+.link-button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 16px;
+  background: transparent;
+  color: var(--ios-green);
+  box-shadow: none;
+}
+
+.link-button:hover {
+  background: var(--ios-green-soft);
+}
+
+.secondary-button {
+  background: #f2f4f7;
+  color: #344054;
+}
+
+.secondary-button:hover {
+  background: #e4e7ec;
+}
+
+.auth-switch {
+  text-align: center;
+  color: var(--ios-muted);
+  font-size: 15px;
+}
+
+.text-button {
+  min-height: auto;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ios-green);
+  box-shadow: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.text-button:hover {
+  background: transparent;
+  color: var(--ios-green-dark);
+}

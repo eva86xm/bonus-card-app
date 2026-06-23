@@ -281,6 +281,53 @@ async function requestSmsPassword(phone) {
   });
 }
 
+async function registerCard(phone) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: {
+        message: 'SMS-код отправлен. Для теста используйте код 123456.'
+      }
+    };
+  }
+
+  return sncRequest('/api/auth/register/card', {
+    method: 'POST',
+    body: JSON.stringify({
+      phone: toSncPhone(phone)
+    })
+  });
+}
+
+async function confirmRegisterCard(phone, code) {
+  if (isMockMode()) {
+    if (String(code).trim() !== '123456') {
+      return {
+        ok: false,
+        status: 403,
+        data: 'Неверный код из SMS'
+      };
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      data: {
+        cardNumber: '9000 1200 3456',
+        message: 'Карта зарегистрирована'
+      }
+    };
+  }
+
+  return sncRequest('/api/auth/register/card/confirm', {
+    method: 'POST',
+    body: JSON.stringify({
+      phone: toSncPhone(phone),
+      code: String(code).trim()
+    })
+  });
+}
 async function login(username, password) {
   if (isMockMode()) {
     if (password !== '123456') {
@@ -394,6 +441,8 @@ module.exports = {
   toCardResponse,
   ping,
   requestSmsPassword,
+  registerCard,
+  confirmRegisterCard,
   login,
   refreshTokens,
   logout,

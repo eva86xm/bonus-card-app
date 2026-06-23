@@ -169,6 +169,20 @@ const backendApi = {
     });
   },
 
+    registerCard(phone) {
+    return this.request('/api/snc/register-card', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+  },
+
+  confirmRegisterCard(phone, code) {
+    return this.request('/api/snc/register-card/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code })
+    });
+  },
+
   login(username, password) {
     return this.request('/api/snc/login', {
       method: 'POST',

@@ -52,8 +52,38 @@
     <button type="submit" id="loginButton">Войти</button>
   </div>
 
+<div class="hidden" id="registerStep">
+  <label for="registerPhoneInput">Телефон для регистрации</label>
+  <input
+    id="registerPhoneInput"
+    type="tel"
+    placeholder="+7 900 000-00-00"
+    autocomplete="tel"
+  />
+
+  <button type="button" id="registerSmsButton">Получить SMS для регистрации</button>
+
+  <label for="registerCodeInput">Код из SMS</label>
+  <input
+    id="registerCodeInput"
+    type="text"
+    placeholder="0000"
+    inputmode="numeric"
+  />
+
+  <button type="button" id="confirmRegisterButton">Зарегистрировать карту</button>
+  <button type="button" class="secondary-button" id="backToLoginButton">Вернуться ко входу</button>
+</div>
+
   <p class="form-message" id="loginMessage"></p>
 </form>
+
+<p class="auth-switch">
+  Нет карты?
+  <button type="button" class="text-button" id="showRegisterButton">
+    Зарегистрировать
+  </button>
+</p>
 
       <p class="hint">
         Для прототипа используйте номер +7 900 111-22-33

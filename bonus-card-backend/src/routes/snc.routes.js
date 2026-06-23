@@ -5,6 +5,8 @@ const router = Router();
 
 router.get('/ping', sncController.ping);
 router.post('/request-sms', sncController.requestSms);
+router.post('/register-card', sncController.registerCard);
+router.post('/register-card/confirm', sncController.confirmRegisterCard);
 router.post('/login', sncController.login);
 router.post('/refresh', sncController.refreshTokens);
 router.post('/logout', sncController.logout);
