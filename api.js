@@ -77,19 +77,19 @@ const sncApi = {
     }
   ],
 
-  normalizePhone(phone) {
-  let digits = phone.replace(/\D/g, '');
+   normalizePhone(phone) {
+    let digits = String(phone || '').replace(/\D/g, '');
 
-  if (digits.startsWith('8')) {
-    digits = '7' + digits.slice(1);
-  }
+    if (digits.startsWith('8')) {
+      digits = '7' + digits.slice(1);
+    }
 
-  if (digits.length === 10) {
-    digits = '7' + digits;
-  }
+    if (digits.length === 10) {
+      digits = '7' + digits;
+    }
 
-  return digits;
-},
+    return digits;
+  },
 
   findClientByPhone(phone) {
     const normalizedPhone = this.normalizePhone(phone);
@@ -138,7 +138,7 @@ sncApi.saveClients = function () {
 };
 
 const backendApi = {
-  baseUrl: 'http://localhost:3000',
+  baseUrl: '',
 
   async request(path, options = {}) {
     const response = await fetch(`${this.baseUrl}${path}`, {

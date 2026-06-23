@@ -1,7 +1,7 @@
 const loginForm = document.querySelector('#loginForm');
 const phoneInput = document.querySelector('#phoneInput');
-const requestSmsButton = document.getElementById('requestSmsButton');
-const smsCodeInput = document.getElementById('smsCodeInput');
+const requestSmsButton = document.querySelector('#requestSmsButton');
+const smsCodeInput = document.querySelector('#smsCodeInput');
 const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
 const loginMessage = document.querySelector('#loginMessage');
@@ -40,7 +40,7 @@ function showDashboard(client) {
 
   loyaltyProgram.textContent = client.loyaltyProgram;
   cardOwner.textContent = client.name;
-  lastOperation.textContent = client.transactions[0].date;
+  lastOperation.textContent = client.transactions[0]?.date || '—';
 
   bonusBalance.textContent = client.balance;
   availableBonus.textContent = client.available;
@@ -71,7 +71,8 @@ function showLogin() {
   phoneInput.value = '';
   loginMessage.textContent = '';
   adminMessage.textContent = '';
-    showPhoneStep();
+
+  showPhoneStep();
 }
 
 function renderTransactions(transactions) {
@@ -115,21 +116,10 @@ function formatPhone(value) {
 
   let result = '+7';
 
-  if (part1) {
-    result += ' ' + part1;
-  }
-
-  if (part2) {
-    result += ' ' + part2;
-  }
-
-  if (part3) {
-    result += '-' + part3;
-  }
-
-  if (part4) {
-    result += '-' + part4;
-  }
+  if (part1) result += ' ' + part1;
+  if (part2) result += ' ' + part2;
+  if (part3) result += '-' + part3;
+  if (part4) result += '-' + part4;
 
   return result;
 }
@@ -224,12 +214,12 @@ loginForm.addEventListener('submit', async function (event) {
     }
 
     const accessToken = result.data.accessToken;
-const refreshToken = result.data.refreshToken;
+    const refreshToken = result.data.refreshToken;
 
-localStorage.setItem('accessToken', accessToken);
-localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
 
-await loadSncDashboard(accessToken);
+    await loadSncDashboard(accessToken);
   } catch (error) {
     showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
   }
