@@ -783,3 +783,20 @@ button:hover {
     border-radius: 18px;
   }
 }
+
+.login-screen {
+  padding-top: 34px;
+}
+
+.brand {
+  margin-bottom: 28px;
+}
+
+.login-form {
+  margin-top: 0;
+}
+
+.hint {
+  max-width: 440px;
+  line-height: 1.35;
+}
