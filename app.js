@@ -18,6 +18,9 @@ const lastOperation = document.querySelector('#lastOperation');
 const bonusBalance = document.querySelector('#bonusBalance');
 const availableBonus = document.querySelector('#availableBonus');
 const qrBox = document.querySelector('#qrBox');
+const qrModal = document.querySelector('#qrModal');
+const qrModalBox = document.querySelector('#qrModalBox');
+const qrModalClose = document.querySelector('#qrModalClose');
 const transactionsList = document.querySelector('#transactionsList');
 
 const bindCardForm = document.querySelector('#bindCardForm');
@@ -26,6 +29,7 @@ const adminCardInput = document.querySelector('#adminCardInput');
 const adminMessage = document.querySelector('#adminMessage');
 
 let currentClient = null;
+let currentQrValue = '';
 
 function showDashboard(client) {
   currentClient = client;
@@ -45,7 +49,8 @@ function showDashboard(client) {
   bonusBalance.textContent = client.balance;
   availableBonus.textContent = client.available;
 
-  renderQrCode(client.qrValue || client.cardNumber.replace(/\s/g, ''));
+  currentQrValue = client.qrValue || client.cardNumber.replace(/\s/g, '');
+  renderQrCode(currentQrValue);
   renderTransactions(client.transactions);
 }
 
@@ -62,15 +67,47 @@ function renderQrCode(value) {
   });
 }
 
+function renderLargeQrCode(value) {
+  qrModalBox.innerHTML = '';
+
+  new QRCode(qrModalBox, {
+    text: value,
+    width: 240,
+    height: 240,
+    colorDark: '#0a332e',
+    colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.H
+  });
+}
+
+function openQrModal() {
+  if (!currentQrValue) return;
+
+  renderLargeQrCode(currentQrValue);
+  qrModal.classList.remove('hidden');
+}
+
+function closeQrModal() {
+  qrModal.classList.add('hidden');
+  qrModalBox.innerHTML = '';
+}
+
 function showLogin() {
   currentClient = null;
+  currentQrValue = '';
+
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
 
   dashboard.classList.add('hidden');
   loginScreen.classList.remove('hidden');
 
   phoneInput.value = '';
   loginMessage.textContent = '';
-  adminMessage.textContent = '';
+
+  if (adminMessage) {
+    adminMessage.textContent = '';
+  }
 
   showPhoneStep();
 }
@@ -272,3 +309,30 @@ bindCardForm.addEventListener('submit', function (event) {
     showDashboard(currentClient);
   }
 });
+
+qrBox.addEventListener('click', openQrModal);
+qrModalClose.addEventListener('click', closeQrModal);
+
+qrModal.addEventListener('click', function (event) {
+  if (event.target === qrModal) {
+    closeQrModal();
+  }
+});
+
+async function restoreSession() {
+  const accessToken = localStorage.getItem('accessToken');
+
+  if (!accessToken) {
+    return;
+  }
+
+  try {
+    await loadSncDashboard(accessToken);
+  } catch {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    showPhoneStep();
+  }
+}
+
+restoreSession();
