@@ -186,13 +186,13 @@ function showRegisterStep() {
   phoneStep.classList.add('hidden');
   smsStep.classList.add('hidden');
   registerStep.classList.remove('hidden');
-  showRegisterButton.classList.add('hidden');
+  showRegisterButton.closest('.auth-switch').classList.add('hidden');
   loginMessage.textContent = '';
 }
 
 function hideRegisterStep() {
   registerStep.classList.add('hidden');
-  showRegisterButton.classList.remove('hidden');
+  showRegisterButton.closest('.auth-switch').classList.remove('hidden');
   showPhoneStep();
 }
 
