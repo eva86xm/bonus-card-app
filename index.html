@@ -53,26 +53,37 @@
   </div>
 
 <div class="hidden" id="registerStep">
-  <label for="registerPhoneInput">Телефон для регистрации</label>
-  <input
-    id="registerPhoneInput"
-    type="tel"
-    placeholder="+7 900 000-00-00"
-    autocomplete="tel"
-  />
+  <div id="registerPhoneStep">
+    <label for="registerPhoneInput">Телефон для регистрации</label>
+    <input
+      id="registerPhoneInput"
+      type="tel"
+      placeholder="+7 900 000-00-00"
+      autocomplete="tel"
+    />
 
-  <button type="button" id="registerSmsButton">Получить SMS для регистрации</button>
+    <button type="button" id="registerSmsButton">
+      Получить SMS
+    </button>
+  </div>
 
-  <label for="registerCodeInput">Код из SMS</label>
-  <input
-    id="registerCodeInput"
-    type="text"
-    placeholder="0000"
-    inputmode="numeric"
-  />
+  <div class="hidden" id="registerCodeStep">
+    <label for="registerCodeInput">Код из SMS</label>
+    <input
+      id="registerCodeInput"
+      type="text"
+      placeholder="0000"
+      inputmode="numeric"
+    />
 
-  <button type="button" id="confirmRegisterButton">Зарегистрировать карту</button>
-  <button type="button" class="secondary-button" id="backToLoginButton">Вернуться ко входу</button>
+    <button type="button" id="confirmRegisterButton">
+      Зарегистрировать
+    </button>
+  </div>
+
+  <button type="button" class="secondary-button" id="backToLoginButton">
+    Вернуться ко входу
+  </button>
 </div>
 
   <p class="form-message" id="loginMessage"></p>

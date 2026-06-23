@@ -1281,3 +1281,18 @@ button:hover {
   background: transparent;
   color: var(--ios-green-dark);
 }
+
+.auth-switch.hidden {
+  display: none;
+}
+
+#registerPhoneStep,
+#registerCodeStep {
+  display: grid;
+  gap: 12px;
+}
+
+#registerPhoneStep.hidden,
+#registerCodeStep.hidden {
+  display: none;
+}

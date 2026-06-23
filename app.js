@@ -5,6 +5,8 @@ const smsCodeInput = document.querySelector('#smsCodeInput');
 const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
 const registerStep = document.querySelector('#registerStep');
+const registerPhoneStep = document.querySelector('#registerPhoneStep');
+const registerCodeStep = document.querySelector('#registerCodeStep');
 const registerPhoneInput = document.querySelector('#registerPhoneInput');
 const registerSmsButton = document.querySelector('#registerSmsButton');
 const registerCodeInput = document.querySelector('#registerCodeInput');
@@ -186,12 +188,16 @@ function showRegisterStep() {
   phoneStep.classList.add('hidden');
   smsStep.classList.add('hidden');
   registerStep.classList.remove('hidden');
+  registerPhoneStep.classList.remove('hidden');
+  registerCodeStep.classList.add('hidden');
   showRegisterButton.closest('.auth-switch').classList.add('hidden');
   loginMessage.textContent = '';
 }
 
 function hideRegisterStep() {
   registerStep.classList.add('hidden');
+  registerPhoneStep.classList.remove('hidden');
+  registerCodeStep.classList.add('hidden');
   showRegisterButton.closest('.auth-switch').classList.remove('hidden');
   showPhoneStep();
 }
@@ -353,9 +359,11 @@ registerPhoneInput.addEventListener('input', function () {
 registerSmsButton.addEventListener('click', async function () {
   const phone = registerPhoneInput.value.trim();
 
-  if (!phone) {
-    showLoginMessage('Введите номер телефона');
-    return;
+  if (result.ok) {
+  registerPhoneStep.classList.add('hidden');
+  registerCodeStep.classList.remove('hidden');
+  showLoginMessage('SMS отправлено. Для теста используйте код 123456.');
+  return;
   }
 
   const normalizedPhone = sncApi.normalizePhone(phone);
