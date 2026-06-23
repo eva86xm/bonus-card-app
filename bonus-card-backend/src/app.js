@@ -13,6 +13,7 @@ app.use(cors({
   origin: process.env.CLIENT_ORIGIN || '*',
   credentials: true
 }));
+
 app.use(express.json());
 
 app.get('/health', (req, res) => {
@@ -26,43 +27,5 @@ app.use('/api/admin', adminRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
-
-async function sncRequest(path, options = {}) {
-  const baseUrl = process.env.SNC_API_URL;
-  const apiKey = process.env.SNC_API_KEY;
-
-  if (!baseUrl || !apiKey) {
-    throw new Error('SNC_API_URL или SNC_API_KEY не настроены');
-  }
-
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...options,
-    headers: {
-      'Api-Key': apiKey,
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    }
-  });
-
-  const text = await response.text();
-
-  let data = null;
-
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    data = text;
-  }
-
-  return {
-    ok: response.ok,
-    status: response.status,
-    data
-  };
-}
-
-async function ping() {
-  return sncRequest('/api/auth/user');
-}
 
 module.exports = app;
