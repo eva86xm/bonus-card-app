@@ -1,3 +1,4 @@
+const axios = require('axios');
 const clients = [
   {
     phone: '+7 900 111-22-33',
@@ -147,11 +148,131 @@ function toCardResponse(client) {
   };
 }
 
+async function sncRequest(path, options = {}) {
+  const baseUrl = process.env.SNC_API_URL;
+  const apiKey = process.env.SNC_API_KEY;
+
+  if (!baseUrl || !apiKey) {
+    throw new Error('SNC_API_URL или SNC_API_KEY не настроены');
+  }
+
+  try {
+    const response = await axios({
+      url: `${baseUrl}${path}`,
+      method: options.method || 'GET',
+      data: options.body ? JSON.parse(options.body) : undefined,
+      headers: {
+        'Api-Key': apiKey,
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      },
+      validateStatus: () => true
+    });
+
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      data: response.data
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      data: error.message
+    };
+  }
+}
+
+async function ping() {
+  return sncRequest('/api/auth/user');
+}
+
+function toSncPhone(phone) {
+  const normalizedPhone = normalizePhone(phone);
+
+  return normalizedPhone;
+}
+
+async function requestSmsPassword(phone) {
+  return sncRequest('/api/auth/sms-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      phoneNumber: toSncPhone(phone),
+      flags: 2
+    })
+  });
+}
+
+async function login(username, password) {
+  return sncRequest('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({
+      username,
+      password
+    })
+  });
+}
+
+async function refreshTokens(refreshToken) {
+  return sncRequest('/api/auth/refresh', {
+    method: 'POST',
+    body: JSON.stringify({
+      refreshToken
+    })
+  });
+}
+
+async function logout(accessToken) {
+  return sncRequest('/api/auth/logout', {
+    method: 'POST',
+    headers: withAccessToken(accessToken)
+  });
+}
+
+function withAccessToken(accessToken) {
+  return {
+    Authorization: `Bearer ${accessToken}`
+  };
+}
+
+async function getUser(accessToken) {
+  return sncRequest('/api/auth/user', {
+    headers: withAccessToken(accessToken)
+  });
+}
+
+async function getOwner(accessToken) {
+  return sncRequest('/api/information/owner', {
+    headers: withAccessToken(accessToken)
+  });
+}
+
+async function getTransactions(accessToken) {
+  return sncRequest('/api/reports/transactions', {
+    headers: withAccessToken(accessToken)
+  });
+}
+
+async function getQrCode(accessToken) {
+  return sncRequest('/api/qr-code/generate', {
+    headers: withAccessToken(accessToken)
+  });
+}
+
 module.exports = {
   normalizePhone,
   listClients,
   findClientByPhone,
   bindCardToPhone,
   toClientSummary,
-  toCardResponse
+  toCardResponse,
+  ping,
+  requestSmsPassword,
+  login,
+  refreshTokens,
+  logout,
+  getUser,
+  getOwner,
+  getTransactions,
+  getQrCode
 };
