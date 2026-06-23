@@ -240,6 +240,13 @@ requestSmsButton.addEventListener('click', async function () {
     return;
   }
 
+  const normalizedPhone = sncApi.normalizePhone(phone);
+
+if (normalizedPhone.length !== 11) {
+  showLoginMessage('Введите полный номер телефона');
+  return;
+}
+
   requestSmsButton.disabled = true;
   requestSmsButton.textContent = 'Отправляем...';
   showLoginMessage('Отправляем SMS-код...');
