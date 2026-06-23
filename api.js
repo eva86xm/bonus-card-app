@@ -136,3 +136,91 @@ if (savedClients) {
 sncApi.saveClients = function () {
   localStorage.setItem('sncClients', JSON.stringify(this.clients));
 };
+
+const backendApi = {
+  baseUrl: 'http://localhost:3000',
+
+  async request(path, options = {}) {
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      },
+      ...options
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        status: response.status,
+        data
+      };
+    }
+
+    return data;
+  },
+
+  requestSms(phone) {
+    return this.request('/api/snc/request-sms', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+  },
+
+  login(username, password) {
+    return this.request('/api/snc/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+  },
+
+  getUser(accessToken) {
+    return this.request('/api/snc/user', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+  },
+
+  getOwner(accessToken) {
+    return this.request('/api/snc/owner', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+  },
+
+  getTransactions(accessToken) {
+    return this.request('/api/snc/transactions', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+  },
+
+  getQrCode(accessToken) {
+    return this.request('/api/snc/qr-code', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+  },
+
+  refresh(refreshToken) {
+    return this.request('/api/snc/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken })
+    });
+  },
+
+  logout(accessToken) {
+    return this.request('/api/snc/logout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+  }
+};

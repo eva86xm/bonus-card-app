@@ -72,12 +72,35 @@ p {
 
 .login-form {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   padding: 22px;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid #dfe7ee;
   border-radius: 12px;
   box-shadow: 0 18px 42px rgba(17, 24, 39, 0.08);
+}
+
+#phoneStep,
+#smsStep {
+  display: grid;
+  gap: 12px;
+}
+
+#phoneStep.hidden,
+#smsStep.hidden {
+  display: none;
+}
+
+.login-form button {
+  width: 100%;
+}
+
+.login-form input {
+  height: 48px;
+}
+
+.login-form .form-message:empty {
+  display: none;
 }
 
 .admin-form {
@@ -342,11 +365,14 @@ button:hover {
 }
 
 .form-message {
-  min-height: 20px;
   color: #b42318;
   font-weight: 700;
   font-size: 14px;
-  padding-top: 2px;
+  line-height: 1.4;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff3f0;
+  border: 1px solid #ffd6cf;
 }
 
 .admin-panel {

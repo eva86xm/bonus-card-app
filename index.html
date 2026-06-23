@@ -18,17 +18,33 @@
       </div>
 
       <form class="login-form" id="loginForm">
-        <label for="phoneInput">Телефон</label>
-        <input
-          id="phoneInput"
-          type="tel"
-          placeholder="+7 900 000-00-00"
-          autocomplete="tel"
-          required
-        />
-        <button type="submit">Войти</button>
-        <p class="form-message" id="loginMessage"></p>
-      </form>
+  <div id="phoneStep">
+    <label for="phoneInput">Телефон</label>
+    <input
+      id="phoneInput"
+      type="tel"
+      placeholder="+7 900 000-00-00"
+      autocomplete="tel"
+      required
+    />
+
+    <button type="button" id="requestSmsButton">Получить SMS</button>
+  </div>
+
+  <div class="hidden" id="smsStep">
+    <label for="smsCodeInput">Код из SMS</label>
+    <input
+      id="smsCodeInput"
+      type="text"
+      placeholder="0000"
+      inputmode="numeric"
+    />
+
+    <button type="submit" id="loginButton">Войти</button>
+  </div>
+
+  <p class="form-message" id="loginMessage"></p>
+</form>
 
       <p class="hint">
         Для прототипа используйте номер +7 900 111-22-33

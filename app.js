@@ -1,5 +1,9 @@
 const loginForm = document.querySelector('#loginForm');
 const phoneInput = document.querySelector('#phoneInput');
+const requestSmsButton = document.getElementById('requestSmsButton');
+const smsCodeInput = document.getElementById('smsCodeInput');
+const phoneStep = document.querySelector('#phoneStep');
+const smsStep = document.querySelector('#smsStep');
 const loginMessage = document.querySelector('#loginMessage');
 const loginScreen = document.querySelector('#loginScreen');
 const dashboard = document.querySelector('#dashboard');
@@ -67,6 +71,7 @@ function showLogin() {
   phoneInput.value = '';
   loginMessage.textContent = '';
   adminMessage.textContent = '';
+    showPhoneStep();
 }
 
 function renderTransactions(transactions) {
@@ -129,24 +134,105 @@ function formatPhone(value) {
   return result;
 }
 
+function showLoginMessage(message) {
+  loginMessage.textContent = message;
+}
+
+function showPhoneStep() {
+  phoneStep.classList.remove('hidden');
+  smsStep.classList.add('hidden');
+  smsCodeInput.value = '';
+}
+
+function showSmsStep() {
+  phoneStep.classList.add('hidden');
+  smsStep.classList.remove('hidden');
+  showLoginMessage('Введите код из SMS');
+}
+
+async function loadSncDashboard(accessToken) {
+  showLoginMessage('Загружаем данные карты...');
+
+  const userResult = await backendApi.getUser(accessToken);
+  const ownerResult = await backendApi.getOwner(accessToken);
+  const transactionsResult = await backendApi.getTransactions(accessToken);
+  const qrResult = await backendApi.getQrCode(accessToken);
+
+  console.log('SNC user:', userResult);
+  console.log('SNC owner:', ownerResult);
+  console.log('SNC transactions:', transactionsResult);
+  console.log('SNC QR:', qrResult);
+
+  showLoginMessage('Данные получены. Посмотрите console.log.');
+}
+
 phoneInput.addEventListener('input', function () {
   phoneInput.value = formatPhone(phoneInput.value);
-  loginMessage.textContent = '';
+  showLoginMessage('');
 });
 
-loginForm.addEventListener('submit', function (event) {
-  event.preventDefault();
+requestSmsButton.addEventListener('click', async function () {
+  const phone = phoneInput.value.trim();
 
-  loginMessage.textContent = '';
-
-  const client = sncApi.findClientByPhone(phoneInput.value);
-
-  if (!client) {
-    loginMessage.textContent = 'Клиент не найден. Проверьте номер телефона.';
+  if (!phone) {
+    showLoginMessage('Введите номер телефона');
     return;
   }
 
-  showDashboard(client);
+  requestSmsButton.disabled = true;
+  requestSmsButton.textContent = 'Отправляем...';
+  showLoginMessage('Отправляем SMS-код...');
+
+  try {
+    const result = await backendApi.requestSms(phone);
+
+    if (result.ok) {
+      showSmsStep();
+      return;
+    }
+
+    const message = result.data?.data || result.data?.error || 'Не удалось отправить SMS';
+    showLoginMessage(message);
+  } catch (error) {
+    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+  } finally {
+    requestSmsButton.disabled = false;
+    requestSmsButton.textContent = 'Получить SMS';
+  }
+});
+
+loginForm.addEventListener('submit', async function (event) {
+  event.preventDefault();
+
+  const phone = phoneInput.value.trim();
+  const code = smsCodeInput.value.trim();
+
+  if (!code) {
+    showLoginMessage('Введите код из SMS');
+    return;
+  }
+
+  showLoginMessage('Проверяем код...');
+
+  try {
+    const result = await backendApi.login(sncApi.normalizePhone(phone), code);
+
+    if (!result.ok) {
+      const message = result.data?.data || result.data?.error || 'Не удалось войти';
+      showLoginMessage(message);
+      return;
+    }
+
+    const accessToken = result.data.accessToken;
+const refreshToken = result.data.refreshToken;
+
+localStorage.setItem('accessToken', accessToken);
+localStorage.setItem('refreshToken', refreshToken);
+
+await loadSncDashboard(accessToken);
+  } catch (error) {
+    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+  }
 });
 
 logoutButton.addEventListener('click', function () {
