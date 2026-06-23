@@ -138,7 +138,7 @@ sncApi.saveClients = function () {
 };
 
 const backendApi = {
-  baseUrl: '',
+  baseUrl: 'http://localhost:3000',
 
   async request(path, options = {}) {
     const response = await fetch(`${this.baseUrl}${path}`, {

@@ -193,6 +193,74 @@ function toSncPhone(phone) {
   return normalizedPhone;
 }
 
+function isMockMode() {
+  return process.env.MOCK_MODE === 'true';
+}
+
+const mockTokens = {
+  accessToken: 'mock-access-token',
+  refreshToken: 'mock-refresh-token'
+};
+
+const mockUser = {
+  role: 'client',
+  name: 'Анна Иванова',
+  cards: [
+    {
+      cardKey: 'mock-card-key',
+      graphicalNumber: '9000 1200 3456',
+      state: 3,
+      balance: 1280,
+      isSelected: true
+    }
+  ]
+};
+
+const mockOwner = {
+  name: 'Анна Иванова',
+  organizationName: 'ИНП',
+  cardInfo: {
+    cardKey: 'mock-card-key',
+    graphicalNumber: '9000 1200 3456',
+    cardStateKey: 3,
+    discountApps: [
+      {
+        bonusSum: 1280,
+        bonusCurrent: 640,
+        bonusDiscount: 0
+      }
+    ],
+    cardStatus: {
+      currentStatusName: 'Активна'
+    }
+  }
+};
+
+const mockTransactions = [
+  {
+    transactionKey: '1',
+    date: '23.06.2026',
+    nameAzs: 'АЗС 12',
+    resourceName: 'Покупка топлива',
+    bonusIn: 96,
+    bonusOut: 0,
+    bonusBalance: 1280
+  },
+  {
+    transactionKey: '2',
+    date: '20.06.2026',
+    nameAzs: 'АЗС 04',
+    resourceName: 'Списание бонусов',
+    bonusIn: 0,
+    bonusOut: 250,
+    bonusBalance: 1184
+  }
+];
+
+const mockQrCode = {
+  value: '900012003456'
+};
+
 async function requestSmsPassword(phone) {
   return sncRequest('/api/auth/sms-password', {
     method: 'POST',
@@ -203,7 +271,43 @@ async function requestSmsPassword(phone) {
   });
 }
 
+async function requestSmsPassword(phone) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: {
+        message: 'SMS-код отправлен. Для теста используйте код 123456.'
+      }
+    };
+  }
+
+  return sncRequest('/api/auth/sms-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      phoneNumber: toSncPhone(phone),
+      flags: 2
+    })
+  });
+}
+
 async function login(username, password) {
+  if (isMockMode()) {
+    if (password !== '123456') {
+      return {
+        ok: false,
+        status: 403,
+        data: 'Неверный код'
+      };
+    }
+
+    return {
+      ok: true,
+      status: 200,
+      data: mockTokens
+    };
+  }
+
   return sncRequest('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({
@@ -236,24 +340,56 @@ function withAccessToken(accessToken) {
 }
 
 async function getUser(accessToken) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: mockUser
+    };
+  }
+
   return sncRequest('/api/auth/user', {
     headers: withAccessToken(accessToken)
   });
 }
 
 async function getOwner(accessToken) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: mockOwner
+    };
+  }
+
   return sncRequest('/api/information/owner', {
     headers: withAccessToken(accessToken)
   });
 }
 
 async function getTransactions(accessToken) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: mockTransactions
+    };
+  }
+
   return sncRequest('/api/reports/transactions', {
     headers: withAccessToken(accessToken)
   });
 }
 
 async function getQrCode(accessToken) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: mockQrCode
+    };
+  }
+
   return sncRequest('/api/qr-code/generate', {
     headers: withAccessToken(accessToken)
   });

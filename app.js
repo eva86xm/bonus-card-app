@@ -45,7 +45,7 @@ function showDashboard(client) {
   bonusBalance.textContent = client.balance;
   availableBonus.textContent = client.available;
 
-  renderQrCode(client.cardNumber.replace(/\s/g, ''));
+  renderQrCode(client.qrValue || client.cardNumber.replace(/\s/g, ''));
   renderTransactions(client.transactions);
 }
 
@@ -148,12 +148,41 @@ async function loadSncDashboard(accessToken) {
   const transactionsResult = await backendApi.getTransactions(accessToken);
   const qrResult = await backendApi.getQrCode(accessToken);
 
-  console.log('SNC user:', userResult);
-  console.log('SNC owner:', ownerResult);
-  console.log('SNC transactions:', transactionsResult);
-  console.log('SNC QR:', qrResult);
+  if (!userResult.ok || !ownerResult.ok || !transactionsResult.ok || !qrResult.ok) {
+    showLoginMessage('Не удалось загрузить данные карты');
+    return;
+  }
 
-  showLoginMessage('Данные получены. Посмотрите console.log.');
+  const user = userResult.data;
+  const owner = ownerResult.data;
+  const card = owner.cardInfo;
+  const discount = card.discountApps?.[0] || {};
+  const transactions = transactionsResult.data || [];
+  const qrValue = qrResult.data?.value || card.graphicalNumber;
+
+  const client = {
+    name: owner.name || user.name || 'Клиент',
+    cardNumber: card.graphicalNumber || '0000 0000 0000',
+    status: card.cardStatus?.currentStatusName || 'Активна',
+    loyaltyProgram: owner.organizationName || 'Бонусная программа',
+    balance: discount.bonusSum || 0,
+    available: discount.bonusCurrent || 0,
+    qrValue,
+    transactions: transactions.map((transaction) => {
+      const bonusIn = Number(transaction.bonusIn || 0);
+      const bonusOut = Number(transaction.bonusOut || 0);
+
+      return {
+        date: transaction.date || '—',
+        place: transaction.nameAzs || 'АЗС',
+        title: transaction.resourceName || 'Операция',
+        amount: bonusOut > 0 ? `-${bonusOut}` : `+${bonusIn}`,
+        type: bonusOut > 0 ? 'minus' : 'plus'
+      };
+    })
+  };
+
+  showDashboard(client);
 }
 
 phoneInput.addEventListener('input', function () {
