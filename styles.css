@@ -1117,3 +1117,106 @@ p {
     font-size: 12px;
   }
 }
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.app {
+  width: 100%;
+  max-width: 920px;
+  overflow-x: hidden;
+}
+
+.dashboard,
+.login-screen,
+.contacts-panel,
+.bonus-card,
+.card-info,
+.balance-grid,
+.panel,
+.contacts-hero,
+.compact-list,
+.azs-map,
+.compact-azs-list,
+.ios-tabbar {
+  max-width: 100%;
+}
+
+.contacts-hero,
+.bonus-card,
+.panel,
+.balance-item,
+.card-info div,
+.compact-list,
+.azs-map,
+.azs-row {
+  overflow: hidden;
+}
+
+.contacts-hero {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.contacts-hero-text,
+.contacts-hero h3,
+.contacts-hero p,
+.topbar h2,
+.cardNumber,
+#cardNumber {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.ios-tabbar {
+  width: min(380px, calc(100vw - 32px));
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.dashboard.show-contacts #contactsSection {
+  animation: none;
+}
+
+.azs-map {
+  animation: none;
+}
+
+@media (max-width: 720px) {
+  .app {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .contacts-hero {
+    grid-template-columns: 64px minmax(0, 1fr);
+  }
+
+  .contacts-hero h3 {
+    font-size: 25px;
+    line-height: 1.08;
+  }
+
+  .bonus-card {
+    width: 100%;
+  }
+
+  .ios-tabbar {
+    width: calc(100vw - 32px);
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 390px) {
+  .app {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .ios-tabbar {
+    width: calc(100vw - 24px);
+  }
+}

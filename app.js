@@ -480,11 +480,8 @@ function showDashboardTab(target, shouldScroll = true) {
 
   localStorage.setItem('activeDashboardTab', target);
 
-  if (shouldScroll) {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+ if (shouldScroll) {
+  window.scrollTo(0, 0);
   }
 }
 
