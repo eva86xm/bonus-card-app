@@ -8,7 +8,7 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
-  <link rel="stylesheet" href="styles.css?v=ios5" />
+  <link rel="stylesheet" href="styles.css?v=ios6" />
 
   <meta name="apple-mobile-web-app-title" content="ИНП" />
   <meta name="application-name" content="ИНП" />
@@ -45,8 +45,10 @@
           <input
             id="smsCodeInput"
             type="text"
-            placeholder="0000"
+            placeholder="000000"
             inputmode="numeric"
+            maxlength="6"
+            pattern="[0-9]{6}"
           />
 
           <button type="submit" id="loginButton">Войти</button>
@@ -72,8 +74,10 @@
             <input
               id="registerCodeInput"
               type="text"
-              placeholder="0000"
+              placeholder="000000"
               inputmode="numeric"
+              maxlength="6"
+              pattern="[0-9]{6}"
             />
 
             <button type="button" id="confirmRegisterButton">
@@ -96,9 +100,6 @@
         </button>
       </p>
 
-      <p class="hint">
-        Для прототипа используйте номер +7 900 111-22-33
-      </p>
     </section>
 
     <section class="dashboard hidden" id="dashboard">
@@ -108,7 +109,7 @@
           <h2 id="clientName">Клиент</h2>
         </div>
 
-        <button class="ghost-button" id="logoutButton">Выйти</button>
+        <button type="button" class="ghost-button" id="logoutButton">Выйти</button>
       </header>
 
       <section class="bonus-card" id="cardSection">
@@ -153,143 +154,152 @@
       </section>
 
       <section class="panel" id="historySection">
-        <div class="panel-header">
+        <div class="panel-header history-header">
           <h3>История операций</h3>
+
+          <div class="history-filter">
+            <input id="transactionDateFilter" type="date" />
+            <button type="button" id="clearDateFilterButton">Все</button>
+          </div>
         </div>
 
         <div class="transactions" id="transactionsList"></div>
       </section>
 
-<section class="contacts-panel" id="contactsSection">
-  <div class="contacts-hero">
-    <div class="contacts-logo-wrap">
-      <img class="contacts-logo" src="logo.png" alt="ИНП" />
-    </div>
+      <section class="contacts-panel" id="contactsSection">
+        <div class="contacts-hero">
+          <div class="contacts-logo-wrap">
+            <img class="contacts-logo" src="logo.png" alt="ИНП" />
+          </div>
 
-    <div class="contacts-hero-text">
-      <p class="contacts-kicker">Контакты</p>
-      <h3>Иртышнефтепродукт</h3>
-      <p>Контакты АЗС Ханты-Мансийска</p>
-    </div>
+          <div class="contacts-hero-text">
+            <p class="contacts-kicker">Контакты</p>
+            <h3>Иртышнефтепродукт</h3>
+            <p>Контакты АЗС Ханты-Мансийска</p>
+          </div>
 
-    <div class="hero-actions">
-      <a href="tel:+73467327714">Позвонить</a>
-      <a href="mailto:irtishoil@mail.ru">Написать</a>
-      <a
-        href="https://yandex.ru/maps/?text=Иртышнефтепродукт%20Ханты-Мансийск"
-        target="_blank"
-        rel="noopener"
-      >
-        Маршрут
-      </a>
-    </div>
-  </div>
-
-  <div class="contacts-group">
-    <div class="section-title">
-      <h4>Номера телефонов</h4>
-    </div>
-
-    <div class="contacts-list compact-list">
-      <a class="contact-row" href="tel:+73467327714">
-        <span>Приемная</span>
-        <strong>+7 (3467) 32-77-14</strong>
-      </a>
-
-      <a class="contact-row" href="tel:+73467327713">
-        <span>Бухгалтерия</span>
-        <strong>+7 (3467) 32-77-13</strong>
-      </a>
-
-      <a class="contact-row" href="tel:+79505262484">
-        <span>Менеджер ГСМ</span>
-        <strong>+7 950 52 62 484</strong>
-      </a>
-
-      <a class="contact-row mail" href="mailto:irtishoil@mail.ru">
-        <span>E-mail</span>
-        <strong>irtishoil@mail.ru</strong>
-      </a>
-    </div>
-  </div>
-
-  <div class="contacts-group">
-    <div class="section-title">
-      <h4>Наши АЗС</h4>
-      <p>3 адреса в Ханты-Мансийске</p>
-    </div>
-
-    <div class="azs-map">
-      <iframe
-        src="https://yandex.ru/map-widget/v1/?ll=69.055000%2C61.005000&z=11&mode=search&text=%D0%90%D0%97%D0%A1%20%D0%98%D1%80%D1%82%D1%8B%D1%88%D0%BD%D0%B5%D1%84%D1%82%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%20%D0%A5%D0%B0%D0%BD%D1%82%D1%8B-%D0%9C%D0%B0%D0%BD%D1%81%D0%B8%D0%B9%D1%81%D0%BA"
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-        title="АЗС Иртышнефтепродукт на карте"
-      ></iframe>
-    </div>
-
-    <div class="azs-list compact-azs-list">
-      <a
-        class="azs-row"
-        href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Строителей%2C%201А"
-        target="_blank"
-        rel="noopener"
-      >
-        <div>
-          <strong>АЗС на Строителей</strong>
-          <span>ул. Строителей, 1А</span>
+          <div class="hero-actions">
+            <a href="tel:+73467327714">Позвонить</a>
+            <a href="mailto:irtishoil@mail.ru">Написать</a>
+            <a
+              href="https://yandex.ru/maps/?text=Иртышнефтепродукт%20Ханты-Мансийск"
+              target="_blank"
+              rel="noopener"
+            >
+              Маршрут
+            </a>
+          </div>
         </div>
-        <em>Маршрут</em>
-      </a>
 
-      <a
-        class="azs-row"
-        href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Студенческая%2C%2033"
-        target="_blank"
-        rel="noopener"
-      >
-        <div>
-          <strong>АЗС на Студенческой</strong>
-          <span>ул. Студенческая, 33</span>
+        <div class="contacts-group">
+          <div class="section-title">
+            <h4>Номера телефонов</h4>
+          </div>
+
+          <div class="contacts-list compact-list">
+            <a class="contact-row" href="tel:+73467327714">
+              <span>Приемная</span>
+              <strong>+7 (3467) 32-77-14</strong>
+            </a>
+
+            <a class="contact-row" href="tel:+73467327713">
+              <span>Бухгалтерия</span>
+              <strong>+7 (3467) 32-77-13</strong>
+            </a>
+
+            <a class="contact-row" href="tel:+79505262484">
+              <span>Менеджер ГСМ</span>
+              <strong>+7 950 52 62 484</strong>
+            </a>
+
+            <a class="contact-row mail" href="mailto:irtishoil@mail.ru">
+              <span>E-mail</span>
+              <strong>irtishoil@mail.ru</strong>
+            </a>
+          </div>
         </div>
-        <em>Маршрут</em>
-      </a>
 
-      <a
-        class="azs-row"
-        href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Объездная%2C%2065"
-        target="_blank"
-        rel="noopener"
-      >
-        <div>
-          <strong>АЗС на Объездной</strong>
-          <span>ул. Объездная, 65</span>
+        <div class="contacts-group">
+          <div class="section-title">
+            <h4>Наши АЗС</h4>
+            <p>3 адреса в Ханты-Мансийске</p>
+          </div>
+
+          <div class="azs-map">
+            <div class="map-loader" id="mapLoader">
+              Загружаем карту...
+            </div>
+
+            <iframe
+              id="azsMapFrame"
+              data-src="https://yandex.ru/map-widget/v1/?ll=69.055000%2C61.005000&z=11&mode=search&text=%D0%90%D0%97%D0%A1%20%D0%98%D1%80%D1%82%D1%8B%D1%88%D0%BD%D0%B5%D1%84%D1%82%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%20%D0%A5%D0%B0%D0%BD%D1%82%D1%8B-%D0%9C%D0%B0%D0%BD%D1%81%D0%B8%D0%B9%D1%81%D0%BA"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="АЗС Иртышнефтепродукт на карте"
+            ></iframe>
+          </div>
+
+          <div class="azs-list compact-azs-list">
+            <a
+              class="azs-row"
+              href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Строителей%2C%201А"
+              target="_blank"
+              rel="noopener"
+            >
+              <div>
+                <strong>АЗС на Строителей</strong>
+                <span>ул. Строителей, 1А</span>
+              </div>
+              <em>Маршрут</em>
+            </a>
+
+            <a
+              class="azs-row"
+              href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Студенческая%2C%2033"
+              target="_blank"
+              rel="noopener"
+            >
+              <div>
+                <strong>АЗС на Студенческой</strong>
+                <span>ул. Студенческая, 33</span>
+              </div>
+              <em>Маршрут</em>
+            </a>
+
+            <a
+              class="azs-row"
+              href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Объездная%2C%2065"
+              target="_blank"
+              rel="noopener"
+            >
+              <div>
+                <strong>АЗС на Объездной</strong>
+                <span>ул. Объездная, 65</span>
+              </div>
+              <em>Маршрут</em>
+            </a>
+          </div>
         </div>
-        <em>Маршрут</em>
-      </a>
-    </div>
-  </div>
-</section>
+      </section>
 
-<nav class="ios-tabbar" aria-label="Навигация">
-  <button
-    type="button"
-    class="ios-tabbar-item active"
-    data-target="mainView"
-  >
-    <span class="tab-icon">▣</span>
-    <span>Карта</span>
-  </button>
+      <nav class="ios-tabbar" aria-label="Навигация">
+        <button
+          type="button"
+          class="ios-tabbar-item active"
+          data-target="mainView"
+        >
+          <span class="tab-icon">▣</span>
+          <span>Карта</span>
+        </button>
 
-  <button
-    type="button"
-    class="ios-tabbar-item"
-    data-target="contactsSection"
-  >
-    <span class="tab-icon">☎</span>
-    <span>Контакты</span>
-  </button>
-</nav>
+        <button
+          type="button"
+          class="ios-tabbar-item"
+          data-target="contactsSection"
+        >
+          <span class="tab-icon">☎</span>
+          <span>Контакты</span>
+        </button>
+      </nav>
     </section>
 
     <div class="qr-modal hidden" id="qrModal">
@@ -304,7 +314,7 @@
   </main>
 
   <script src="qrcode.min.js"></script>
-  <script src="api.js?v=ios5"></script>
-  <script src="app.js?v=ios5"></script>
+  <script src="api.js?v=ios6"></script>
+  <script src="app.js?v=ios6"></script>
 </body>
 </html>

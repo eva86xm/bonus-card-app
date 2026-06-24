@@ -4,7 +4,7 @@ const codesByPhone = new Map();
 
 function createCode(phone) {
   const normalizedPhone = sncService.normalizePhone(phone);
-  const code = process.env.DEV_AUTH_CODE || String(Math.floor(1000 + Math.random() * 9000));
+  const code = process.env.DEV_AUTH_CODE || String(Math.floor(100000 + Math.random() * 900000));
 
   codesByPhone.set(normalizedPhone, {
     code,
@@ -15,7 +15,9 @@ function createCode(phone) {
 }
 
 async function sendCode(phone, code) {
-  console.log(`SMS code for ${phone}: ${code}`);
+  if (shouldExposeDevCode()) {
+    console.log(`SMS code for ${phone}: ${code}`);
+  }
 }
 
 function verifyCode(phone, code) {

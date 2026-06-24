@@ -77,7 +77,7 @@ const sncApi = {
     }
   ],
 
-   normalizePhone(phone) {
+  normalizePhone(phone) {
     let digits = String(phone || '').replace(/\D/g, '');
 
     if (digits.startsWith('8')) {
@@ -117,8 +117,7 @@ const sncApi = {
     }
 
     client.cardNumber = cardNumber.trim();
-      this.saveClients();
-
+    this.saveClients();
 
     return {
       ok: true,
@@ -138,48 +137,121 @@ sncApi.saveClients = function () {
 };
 
 const backendApi = {
-  baseUrl: '',
+  baseUrl: ['localhost', '127.0.0.1'].includes(window.location.hostname)
+    ? 'http://localhost:3000'
+    : '',
 
-  async request(path, options = {}) {
+  refreshPromise: null,
+
+  async request(path, options = {}, shouldRetry = true) {
     const response = await fetch(`${this.baseUrl}${path}`, {
+      ...options,
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers || {})
-      },
-      ...options
+      }
     });
 
     const data = await response.json();
 
-    if (!response.ok) {
+    const result = response.ok
+      ? data
+      : {
+          ok: false,
+          status: response.status,
+          data
+        };
+
+    const status = result.status || response.status;
+
+    if (shouldRetry && status === 401) {
+      const refreshed = await this.refreshSessionOnce();
+
+      if (refreshed) {
+        const retryOptions = {
+          ...options,
+          headers: {
+            ...(options.headers || {})
+          }
+        };
+
+        if (retryOptions.headers.Authorization) {
+          retryOptions.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`;
+        }
+
+        return this.request(path, retryOptions, false);
+      }
+
+      this.clearSession();
+
       return {
         ok: false,
-        status: response.status,
-        data
+        status: 401,
+        data: {
+          error: 'Сессия устарела. Войдите заново.'
+        }
       };
     }
 
-    return data;
+    return result;
+  },
+
+  async refreshSession() {
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    if (!refreshToken) {
+      return false;
+    }
+
+    try {
+      const response = await fetch(`${this.baseUrl}/api/snc/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refreshToken })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.ok) {
+        return false;
+      }
+
+      const tokens = result.data;
+
+      if (!tokens.accessToken || !tokens.refreshToken) {
+        return false;
+      }
+
+      localStorage.setItem('accessToken', tokens.accessToken);
+      localStorage.setItem('refreshToken', tokens.refreshToken);
+
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  async refreshSessionOnce() {
+    if (!this.refreshPromise) {
+      this.refreshPromise = this.refreshSession().finally(() => {
+        this.refreshPromise = null;
+      });
+    }
+
+    return this.refreshPromise;
+  },
+
+  clearSession() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   },
 
   requestSms(phone) {
     return this.request('/api/snc/request-sms', {
       method: 'POST',
       body: JSON.stringify({ phone })
-    });
-  },
-
-    registerCard(phone) {
-    return this.request('/api/snc/register-card', {
-      method: 'POST',
-      body: JSON.stringify({ phone })
-    });
-  },
-
-  confirmRegisterCard(phone, code) {
-    return this.request('/api/snc/register-card/confirm', {
-      method: 'POST',
-      body: JSON.stringify({ phone, code })
     });
   },
 
@@ -190,35 +262,49 @@ const backendApi = {
     });
   },
 
-  getUser(accessToken) {
+  getUser() {
     return this.request('/api/snc/user', {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
     });
   },
 
-  getOwner(accessToken) {
+  getOwner() {
     return this.request('/api/snc/owner', {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
     });
   },
 
-  getTransactions(accessToken) {
+  getTransactions() {
     return this.request('/api/snc/transactions', {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
     });
   },
 
-  getQrCode(accessToken) {
+  getQrCode() {
     return this.request('/api/snc/qr-code', {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
+    });
+  },
+
+  registerCard(phone) {
+    return this.request('/api/snc/register-card', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+  },
+
+  confirmRegisterCard(phone, code) {
+    return this.request('/api/snc/register-card/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code })
     });
   },
 

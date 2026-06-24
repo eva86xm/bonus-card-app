@@ -19,13 +19,13 @@ async function requestSms(req, res, next) {
     }
 
     const result = await sncService.requestSmsPassword(phone);
+    const status = result.status >= 100 && result.status <= 599 ? result.status : 500;
 
-    res.status(result.status).json(result);
+    return res.status(status).json(result);
   } catch (error) {
     next(error);
   }
 }
-
 async function registerCard(req, res, next) {
   try {
     const { phone } = req.body;
@@ -189,4 +189,3 @@ module.exports = {
   getTransactions,
   getQrCode
 };
-

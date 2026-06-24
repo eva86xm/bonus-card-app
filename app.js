@@ -1,9 +1,13 @@
 const loginForm = document.querySelector('#loginForm');
 const phoneInput = document.querySelector('#phoneInput');
 const requestSmsButton = document.querySelector('#requestSmsButton');
+const azsMapFrame = document.querySelector('#azsMapFrame');
+const mapLoader = document.querySelector('#mapLoader');
 const smsCodeInput = document.querySelector('#smsCodeInput');
 const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
+const transactionDateFilter = document.querySelector('#transactionDateFilter');
+const clearDateFilterButton = document.querySelector('#clearDateFilterButton');
 
 const registerStep = document.querySelector('#registerStep');
 const registerPhoneStep = document.querySelector('#registerPhoneStep');
@@ -39,6 +43,7 @@ const qrModalClose = document.querySelector('#qrModalClose');
 const transactionsList = document.querySelector('#transactionsList');
 
 let currentClient = null;
+let currentTransactions = [];
 let currentQrValue = '';
 
 function showDashboard(client) {
@@ -47,7 +52,7 @@ function showDashboard(client) {
   loginScreen.classList.add('hidden');
   dashboard.classList.remove('hidden');
   const activeDashboardTab = localStorage.getItem('activeDashboardTab') || 'mainView';
-showDashboardTab(activeDashboardTab, false);
+  showDashboardTab(activeDashboardTab, false);
 
   clientName.textContent = client.name;
   cardNumber.textContent = client.cardNumber;
@@ -126,29 +131,37 @@ function showLogin() {
 }
 
 function renderTransactions(transactions) {
+  currentTransactions = transactions;
+  renderFilteredTransactions();
+}
+
+function renderFilteredTransactions() {
   transactionsList.innerHTML = '';
 
+  let transactions = currentTransactions;
+
+  if (transactionDateFilter && transactionDateFilter.value) {
+    transactions = transactions.filter(function (transaction) {
+      return transaction.rawDate === transactionDateFilter.value;
+    });
+  }
+
+  if (!transactions.length) {
+    transactionsList.innerHTML = '<p class="empty-text">Операций за эту дату нет</p>';
+    return;
+  }
+
   transactions.forEach(function (transaction) {
-    const item = document.createElement('article');
-    const textBlock = document.createElement('div');
-    const title = document.createElement('p');
-    const meta = document.createElement('p');
-    const points = document.createElement('p');
+    const item = document.createElement('div');
+    item.className = 'transaction-item';
 
-    item.className = 'transaction';
-    title.className = 'transaction-title';
-    meta.className = 'transaction-meta';
-    points.className = `transaction-points ${transaction.type}`;
-
-    title.textContent = transaction.title;
-    meta.textContent = `${transaction.date} · ${transaction.place}`;
-    points.textContent = transaction.amount;
-
-    textBlock.appendChild(title);
-    textBlock.appendChild(meta);
-
-    item.appendChild(textBlock);
-    item.appendChild(points);
+    item.innerHTML = `
+      <div>
+        <strong>${transaction.title}</strong>
+        <p>${transaction.date} · ${transaction.place}</p>
+      </div>
+      <span class="${transaction.type}">${transaction.amount}</span>
+    `;
 
     transactionsList.appendChild(item);
   });
@@ -237,61 +250,165 @@ function hideRegisterStep() {
   showLoginMessage('');
 }
 
-async function loadSncDashboard(accessToken) {
+async function loadSncDashboard() {
   showLoginMessage('Загружаем данные карты...');
 
-  const userResult = await backendApi.getUser(accessToken);
-  const ownerResult = await backendApi.getOwner(accessToken);
-  const transactionsResult = await backendApi.getTransactions(accessToken);
-  const qrResult = await backendApi.getQrCode(accessToken);
+  try {
+    const [userResult, ownerResult, transactionsResult, qrResult] = await Promise.all([
+      backendApi.getUser(),
+      backendApi.getOwner(),
+      backendApi.getTransactions(),
+      backendApi.getQrCode()
+    ]);
 
-  if (!userResult.ok || !ownerResult.ok || !transactionsResult.ok || !qrResult.ok) {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    if (!userResult.ok) {
+      throw new Error('Не удалось получить пользователя');
+    }
 
-    dashboard.classList.add('hidden');
-    loginScreen.classList.remove('hidden');
+    const userData = userResult.data || {};
+    const ownerData = ownerResult.ok ? ownerResult.data : {};
+    const transactionsData = transactionsResult.ok && Array.isArray(transactionsResult.data)
+      ? transactionsResult.data
+      : [];
 
-    showPhoneStep();
+    const cards = Array.isArray(userData.cards) ? userData.cards : [];
+    const selectedCard = cards.find(function (card) {
+      return card.isSelected;
+    }) || cards[0] || {};
+
+    const sortedTransactions = transactionsData.slice().sort(function (a, b) {
+      return getTransactionTime(b) - getTransactionTime(a);
+    });
+
+    const qrValue = getQrValue(qrResult, selectedCard.graphicalNumber);
+
+    const client = {
+      phone: phoneInput.value,
+      name: userData.name || ownerData.name || 'Клиент',
+      cardNumber: formatCardNumber(selectedCard.graphicalNumber || ownerData.cardInfo?.graphicalNumber || '0000000000000000'),
+      status: ownerData.cardInfo?.cardStatus?.currentStatusName || getCardStateName(selectedCard.state),
+      loyaltyProgram: 'ИНП',
+      balance: formatNumber(selectedCard.balance || 0),
+      available: formatNumber(selectedCard.balance || 0),
+      qrValue,
+      transactions: sortedTransactions.map(mapSncTransaction)
+    };
+
+    showDashboard(client);
+  } catch (error) {
+    backendApi.clearSession();
+    showLogin();
     showLoginMessage('Сессия устарела. Войдите еще раз.');
-    return;
+  }
+}
+
+function getQrValue(qrResult, fallbackCardNumber) {
+  if (qrResult && qrResult.ok && typeof qrResult.data === 'string') {
+    return qrResult.data;
   }
 
-  const user = userResult.data;
-  const owner = ownerResult.data;
-  const card = owner.cardInfo;
-  const discount = card.discountApps?.[0] || {};
-  const transactions = transactionsResult.data || [];
-  const qrValue = qrResult.data?.value || card.graphicalNumber;
+  if (qrResult && qrResult.ok && qrResult.data && typeof qrResult.data.value === 'string') {
+    return qrResult.data.value;
+  }
 
-  const client = {
-    name: owner.name || user.name || 'Клиент',
-    cardNumber: card.graphicalNumber || '0000 0000 0000',
-    status: card.cardStatus?.currentStatusName || 'Активна',
-    loyaltyProgram: owner.organizationName || 'Бонусная программа',
-    balance: discount.bonusSum || 0,
-    available: discount.bonusCurrent || 0,
-    qrValue,
-    transactions: transactions.map(function (transaction) {
-      const bonusIn = Number(transaction.bonusIn || 0);
-      const bonusOut = Number(transaction.bonusOut || 0);
+  return String(fallbackCardNumber || '').replace(/\s/g, '');
+}
 
-      return {
-        date: transaction.date || '—',
-        place: transaction.nameAzs || 'АЗС',
-        title: transaction.resourceName || 'Операция',
-        amount: bonusOut > 0 ? `-${bonusOut}` : `+${bonusIn}`,
-        type: bonusOut > 0 ? 'minus' : 'plus'
-      };
-    })
+function mapSncTransaction(transaction) {
+  const bonusIn = Number(transaction.bonusIn || 0);
+  const bonusOut = Number(transaction.bonusOut || 0);
+
+  return {
+    rawDate: getDateInputValue(transaction.date),
+    date: formatDate(transaction.date),
+    place: transaction.nameAzs || transaction.division || 'АЗС',
+    title: transaction.resourceName || 'Операция по карте',
+    amount: bonusOut > 0 ? `-${formatNumber(bonusOut)}` : `+${formatNumber(bonusIn)}`,
+    type: bonusOut > 0 ? 'minus' : 'plus'
   };
+}
 
-  showDashboard(client);
+function getTransactionTime(transaction) {
+  if (transaction.datetime) {
+    return Number(transaction.datetime);
+  }
+
+  if (transaction.date) {
+    return new Date(transaction.date).getTime() / 1000;
+  }
+
+  return 0;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return '?';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString('ru-RU');
+}
+
+function getDateInputValue(value) {
+  if (!value) {
+    return '';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+
+  return date.toISOString().slice(0, 10);
+}
+
+function formatNumber(value) {
+  const number = Number(value || 0);
+
+  return new Intl.NumberFormat('ru-RU', {
+    maximumFractionDigits: 2
+  }).format(number);
+}
+
+function formatCardNumber(value) {
+  return String(value || '')
+    .replace(/\D/g, '')
+    .replace(/(.{4})/g, '$1 ')
+    .trim();
+}
+
+function getCardStateName(state) {
+  if ([3, 4, 5, 6, 11, 14, 15].includes(Number(state))) {
+    return 'Активна';
+  }
+
+  if ([10, 16].includes(Number(state))) {
+    return 'Заблокирована';
+  }
+
+  return 'Активна';
 }
 
 phoneInput.addEventListener('input', function () {
   phoneInput.value = formatPhone(phoneInput.value);
   showLoginMessage('');
+});
+
+phoneInput.addEventListener('keydown', function (event) {
+  if (event.key !== 'Enter') {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  requestSmsButton.click();
 });
 
 requestSmsButton.addEventListener('click', async function () {
@@ -334,11 +451,16 @@ requestSmsButton.addEventListener('click', async function () {
 loginForm.addEventListener('submit', async function (event) {
   event.preventDefault();
 
+  if (!phoneStep.classList.contains('hidden')) {
+    requestSmsButton.click();
+    return;
+  }
+
   const phone = phoneInput.value.trim();
   const code = smsCodeInput.value.trim();
 
-  if (!code) {
-    showLoginMessage('Введите код из SMS');
+  if (!/^\d{6}$/.test(code)) {
+    showLoginMessage('Введите 6 цифр из SMS');
     return;
   }
 
@@ -359,7 +481,7 @@ loginForm.addEventListener('submit', async function (event) {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
 
-    await loadSncDashboard(accessToken);
+    await loadSncDashboard();
   } catch {
     showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
   }
@@ -435,8 +557,8 @@ confirmRegisterButton.addEventListener('click', async function () {
   const phone = registerPhoneInput.value.trim();
   const code = registerCodeInput.value.trim();
 
-  if (!code) {
-    showLoginMessage('Введите код из SMS');
+  if (!/^\d{6}$/.test(code)) {
+    showLoginMessage('Введите 6 цифр из SMS');
     return;
   }
 
@@ -480,9 +602,21 @@ function showDashboardTab(target, shouldScroll = true) {
 
   localStorage.setItem('activeDashboardTab', target);
 
- if (shouldScroll) {
-  window.scrollTo(0, 0);
+  if (isContacts && azsMapFrame && !azsMapFrame.src) {
+    setTimeout(function () {
+      azsMapFrame.src = azsMapFrame.dataset.src;
+    }, 100);
   }
+
+  if (shouldScroll) {
+    window.scrollTo(0, 0);
+  }
+}
+
+if (azsMapFrame && mapLoader) {
+  azsMapFrame.addEventListener('load', function () {
+    mapLoader.classList.add('hidden');
+  });
 }
 
 tabbarItems.forEach(function (item) {
@@ -491,18 +625,36 @@ tabbarItems.forEach(function (item) {
   });
 });
 
-async function restoreSession() {
-  const accessToken = localStorage.getItem('accessToken');
+if (transactionDateFilter) {
+  transactionDateFilter.addEventListener('change', renderFilteredTransactions);
+}
 
-  if (!accessToken) {
+if (clearDateFilterButton) {
+  clearDateFilterButton.addEventListener('click', function () {
+    transactionDateFilter.value = '';
+    renderFilteredTransactions();
+  });
+}
+
+async function restoreSession() {
+  const refreshToken = localStorage.getItem('refreshToken');
+
+  if (!refreshToken) {
     return;
   }
 
   try {
-    await loadSncDashboard(accessToken);
+    const refreshed = await backendApi.refreshSession();
+
+    if (!refreshed) {
+      backendApi.clearSession();
+      showPhoneStep();
+      return;
+    }
+
+    await loadSncDashboard();
   } catch {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+    backendApi.clearSession();
     showPhoneStep();
   }
 }
