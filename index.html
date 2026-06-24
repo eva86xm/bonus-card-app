@@ -3,98 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ИНП</title>
 
-<link rel="icon" href="logo.png" />
-<link rel="apple-touch-icon" href="logo.png" />
-<link rel="stylesheet" href="styles.css?v=ios1" />
+  <link rel="icon" href="logo.png" />
+  <link rel="apple-touch-icon" href="logo.png" />
+  <link rel="stylesheet" href="styles.css?v=ios5" />
 
-<meta name="apple-mobile-web-app-title" content="ИНП" />
-<meta name="application-name" content="ИНП" />
-<meta name="theme-color" content="#0f6b57" />
-
+  <meta name="apple-mobile-web-app-title" content="ИНП" />
+  <meta name="application-name" content="ИНП" />
+  <meta name="theme-color" content="#0f6b57" />
 </head>
 
 <body>
   <main class="app">
-  <section class="login-screen" id="loginScreen">
-    <div class="brand">
-      <img class="brand-logo" src="logo.png" alt="ИНП" />
-      <div>
-        <h1>ИНП</h1>
-        <p>Бонусная и топливная карта</p>
+    <section class="login-screen" id="loginScreen">
+      <div class="brand">
+        <img class="brand-logo" src="logo.png" alt="ИНП" />
+        <div>
+          <h1>ИНП</h1>
+          <p>Бонусная и топливная карта</p>
+        </div>
       </div>
-    </div>
 
       <form class="login-form" id="loginForm">
-  <div id="phoneStep">
-    <label for="phoneInput">Телефон</label>
-    <input
-      id="phoneInput"
-      type="tel"
-      placeholder="+7 900 000-00-00"
-      autocomplete="tel"
-      required
-    />
+        <div id="phoneStep">
+          <label for="phoneInput">Телефон</label>
+          <input
+            id="phoneInput"
+            type="tel"
+            placeholder="+7 900 000-00-00"
+            autocomplete="tel"
+            required
+          />
 
-    <button type="button" id="requestSmsButton">Получить SMS</button>
-  </div>
+          <button type="button" id="requestSmsButton">Получить SMS</button>
+        </div>
 
-  <div class="hidden" id="smsStep">
-    <label for="smsCodeInput">Код из SMS</label>
-    <input
-      id="smsCodeInput"
-      type="text"
-      placeholder="0000"
-      inputmode="numeric"
-    />
+        <div class="hidden" id="smsStep">
+          <label for="smsCodeInput">Код из SMS</label>
+          <input
+            id="smsCodeInput"
+            type="text"
+            placeholder="0000"
+            inputmode="numeric"
+          />
 
-    <button type="submit" id="loginButton">Войти</button>
-  </div>
+          <button type="submit" id="loginButton">Войти</button>
+        </div>
 
-<div class="hidden" id="registerStep">
-  <div id="registerPhoneStep">
-    <label for="registerPhoneInput">Телефон для регистрации</label>
-    <input
-      id="registerPhoneInput"
-      type="tel"
-      placeholder="+7 900 000-00-00"
-      autocomplete="tel"
-    />
+        <div class="hidden" id="registerStep">
+          <div id="registerPhoneStep">
+            <label for="registerPhoneInput">Телефон для регистрации</label>
+            <input
+              id="registerPhoneInput"
+              type="tel"
+              placeholder="+7 900 000-00-00"
+              autocomplete="tel"
+            />
 
-    <button type="button" id="registerSmsButton">
-      Получить SMS
-    </button>
-  </div>
+            <button type="button" id="registerSmsButton">
+              Получить SMS для регистрации
+            </button>
+          </div>
 
-  <div class="hidden" id="registerCodeStep">
-    <label for="registerCodeInput">Код из SMS</label>
-    <input
-      id="registerCodeInput"
-      type="text"
-      placeholder="0000"
-      inputmode="numeric"
-    />
+          <div class="hidden" id="registerCodeStep">
+            <label for="registerCodeInput">Код из SMS</label>
+            <input
+              id="registerCodeInput"
+              type="text"
+              placeholder="0000"
+              inputmode="numeric"
+            />
 
-    <button type="button" id="confirmRegisterButton">
-      Зарегистрировать
-    </button>
-  </div>
+            <button type="button" id="confirmRegisterButton">
+              Зарегистрировать карту
+            </button>
+          </div>
 
-  <button type="button" class="secondary-button" id="backToLoginButton">
-    Вернуться ко входу
-  </button>
-</div>
+          <button type="button" class="secondary-button" id="backToLoginButton">
+            Вернуться ко входу
+          </button>
+        </div>
 
-  <p class="form-message" id="loginMessage"></p>
-</form>
+        <p class="form-message" id="loginMessage"></p>
+      </form>
 
-<p class="auth-switch">
-  Нет карты?
-  <button type="button" class="text-button" id="showRegisterButton">
-    Зарегистрировать
-  </button>
-</p>
+      <p class="auth-switch" id="authSwitch">
+        Нет карты?
+        <button type="button" class="text-button" id="showRegisterButton">
+          Зарегистрировать
+        </button>
+      </p>
 
       <p class="hint">
         Для прототипа используйте номер +7 900 111-22-33
@@ -107,6 +107,7 @@
           <p class="eyebrow">Личный кабинет</p>
           <h2 id="clientName">Клиент</h2>
         </div>
+
         <button class="ghost-button" id="logoutButton">Выйти</button>
       </header>
 
@@ -116,23 +117,26 @@
           <h3 id="cardNumber">0000 0000 0000</h3>
           <p id="cardStatus">Активна</p>
         </div>
+
         <div class="qr-box" id="qrBox">QR</div>
       </section>
 
-<section class="card-info">
-  <div>
-    <p>Программа</p>
-    <strong id="loyaltyProgram">Стандарт</strong>
-  </div>
-  <div>
-    <p>Владелец</p>
-    <strong id="cardOwner">Клиент</strong>
-  </div>
-  <div>
-    <p>Последняя операция</p>
-    <strong id="lastOperation">—</strong>
-  </div>
-</section>
+      <section class="card-info">
+        <div>
+          <p>Программа</p>
+          <strong id="loyaltyProgram">Стандарт</strong>
+        </div>
+
+        <div>
+          <p>Владелец</p>
+          <strong id="cardOwner">Клиент</strong>
+        </div>
+
+        <div>
+          <p>Последняя операция</p>
+          <strong id="lastOperation">—</strong>
+        </div>
+      </section>
 
       <section class="balance-grid" id="balanceSection">
         <div class="balance-item">
@@ -140,6 +144,7 @@
           <strong id="bonusBalance">0</strong>
           <span>бонусов</span>
         </div>
+
         <div class="balance-item">
           <p>Доступно к списанию</p>
           <strong id="availableBonus">0</strong>
@@ -147,26 +152,140 @@
         </div>
       </section>
 
-     <nav class="ios-tabbar" aria-label="Навигация">
-  <a class="ios-tabbar-item active" href="#cardSection">Карта</a>
-  <a class="ios-tabbar-item" href="#balanceSection">Баланс</a>
-  <a class="ios-tabbar-item" href="#historySection">История</a>
-</nav>
+      <section class="panel" id="historySection">
+        <div class="panel-header">
+          <h3>История операций</h3>
+        </div>
 
-</section>
+        <div class="transactions" id="transactionsList"></div>
+      </section>
 
-<div class="qr-modal hidden" id="qrModal">
-  <div class="qr-modal-content">
-    <button type="button" class="qr-modal-close" id="qrModalClose">Закрыть</button>
-    <div class="qr-modal-box" id="qrModalBox"></div>
+      <section class="panel contacts-panel" id="contactsSection">
+  <div class="contacts-hero">
+    <img class="contacts-logo" src="logo.png" alt="ИНП" />
+
+    <div>
+      <p class="eyebrow">Контакты</p>
+      <h3>Иртышнефтепродукт</h3>
+      <p>Телефоны, почта и адреса АЗС в Ханты-Мансийске</p>
+    </div>
   </div>
+
+  <div class="quick-actions">
+    <a class="quick-action" href="tel:+73467327714">
+      <span>Позвонить</span>
+      <strong>Приемная</strong>
+    </a>
+
+    <a class="quick-action" href="mailto:irtishoil@mail.ru">
+      <span>Написать</span>
+      <strong>E-mail</strong>
+    </a>
+  </div>
+
+  <div class="contacts-group">
+    <h4>Номера телефонов</h4>
+
+    <div class="contacts-list">
+      <a class="contact-item" href="tel:+73467327714">
+        <span>Приемная</span>
+        <strong>+7 (3467) 32-77-14</strong>
+      </a>
+
+      <a class="contact-item" href="tel:+73467327713">
+        <span>Бухгалтерия</span>
+        <strong>+7 (3467) 32-77-13</strong>
+      </a>
+
+      <a class="contact-item" href="tel:+79505262484">
+        <span>Менеджер по учету ГСМ</span>
+        <strong>+7 950 52 62 484</strong>
+      </a>
+
+      <a class="contact-item" href="mailto:irtishoil@mail.ru">
+        <span>E-mail</span>
+        <strong>irtishoil@mail.ru</strong>
+      </a>
+    </div>
+  </div>
+
+  <div class="contacts-group">
+    <h4>Адреса АЗС</h4>
+
+<div class="azs-map">
+  <iframe
+    src="https://yandex.ru/map-widget/v1/?ll=69.018902%2C61.003180&z=12&mode=search&text=%D0%98%D1%80%D1%82%D1%8B%D1%88%D0%BD%D0%B5%D1%84%D1%82%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%20%D0%A5%D0%B0%D0%BD%D1%82%D1%8B-%D0%9C%D0%B0%D0%BD%D1%81%D0%B8%D0%B9%D1%81%D0%BA"
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade"
+    title="АЗС Иртышнефтепродукт на карте"
+  ></iframe>
 </div>
 
+<div class="azs-list">
+  <a
+    class="azs-item"
+    href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Строителей%2C%201А"
+    target="_blank"
+    rel="noopener"
+  >
+    <strong>АЗС на Строителей</strong>
+    <span>г. Ханты-Мансийск, ул. Строителей, 1А</span>
+  </a>
+
+  <a
+    class="azs-item"
+    href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Студенческая%2C%2033"
+    target="_blank"
+    rel="noopener"
+  >
+    <strong>АЗС на Студенческой</strong>
+    <span>г. Ханты-Мансийск, ул. Студенческая, 33</span>
+  </a>
+
+  <a
+    class="azs-item"
+    href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Объездная%2C%2065"
+    target="_blank"
+    rel="noopener"
+  >
+    <strong>АЗС на Объездной</strong>
+    <span>г. Ханты-Мансийск, ул. Объездная, 65</span>
+  </a>
+</div>
+</section>
+
+      <nav class="ios-tabbar" aria-label="Навигация">
+        <button
+          type="button"
+          class="ios-tabbar-item active"
+          data-target="mainView"
+        >
+          Карта
+        </button>
+
+        <button
+          type="button"
+          class="ios-tabbar-item"
+          data-target="contactsSection"
+        >
+          Контакты
+        </button>
+      </nav>
+    </section>
+
+    <div class="qr-modal hidden" id="qrModal">
+      <div class="qr-modal-content">
+        <button type="button" class="qr-modal-close" id="qrModalClose">
+          Закрыть
+        </button>
+
+        <div class="qr-modal-box" id="qrModalBox"></div>
+      </div>
+    </div>
   </main>
 
   <script src="qrcode.min.js"></script>
-  <script src="api.js?v=ios1"></script>
-  <script src="app.js?v=ios1"></script>
-
+  <script src="api.js?v=ios5"></script>
+  <script src="app.js?v=ios5"></script>
 </body>
 </html>
