@@ -47,7 +47,7 @@ function showDashboard(client) {
   loginScreen.classList.add('hidden');
   dashboard.classList.remove('hidden');
   const activeDashboardTab = localStorage.getItem('activeDashboardTab') || 'mainView';
-showDashboardTab(activeDashboardTab);
+showDashboardTab(activeDashboardTab, false);
 
   clientName.textContent = client.name;
   cardNumber.textContent = client.cardNumber;
@@ -469,7 +469,7 @@ confirmRegisterButton.addEventListener('click', async function () {
   }
 });
 
-function showDashboardTab(target) {
+function showDashboardTab(target, shouldScroll = true) {
   const isContacts = target === 'contactsSection';
 
   dashboard.classList.toggle('show-contacts', isContacts);
@@ -479,6 +479,13 @@ function showDashboardTab(target) {
   });
 
   localStorage.setItem('activeDashboardTab', target);
+
+  if (shouldScroll) {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
 }
 
 tabbarItems.forEach(function (item) {
