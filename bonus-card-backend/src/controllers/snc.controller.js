@@ -4,10 +4,20 @@ async function ping(req, res, next) {
   try {
     const result = await sncService.ping();
 
-    res.json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
+}
+
+function getSafeStatus(status) {
+  return Number.isInteger(status) && status >= 100 && status <= 599
+    ? status
+    : 500;
+}
+
+function sendSncResult(res, result) {
+  return res.status(getSafeStatus(result.status)).json(result);
 }
 
 async function requestSms(req, res, next) {
@@ -19,9 +29,8 @@ async function requestSms(req, res, next) {
     }
 
     const result = await sncService.requestSmsPassword(phone);
-    const status = result.status >= 100 && result.status <= 599 ? result.status : 500;
 
-    return res.status(status).json(result);
+    return sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -36,7 +45,7 @@ async function registerCard(req, res, next) {
 
     const result = await sncService.registerCard(phone);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -52,7 +61,7 @@ async function confirmRegisterCard(req, res, next) {
 
     const result = await sncService.confirmRegisterCard(phone, code);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -68,7 +77,7 @@ async function login(req, res, next) {
 
     const result = await sncService.login(username, password);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -84,7 +93,7 @@ async function refreshTokens(req, res, next) {
 
     const result = await sncService.refreshTokens(refreshToken);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -100,7 +109,7 @@ async function logout(req, res, next) {
 
     const result = await sncService.logout(accessToken);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -122,7 +131,7 @@ async function getUser(req, res, next) {
 
     const result = await sncService.getUser(accessToken);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -138,7 +147,7 @@ async function getOwner(req, res, next) {
 
     const result = await sncService.getOwner(accessToken);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -154,7 +163,7 @@ async function getTransactions(req, res, next) {
 
     const result = await sncService.getTransactions(accessToken);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }
@@ -170,7 +179,7 @@ async function getQrCode(req, res, next) {
 
     const result = await sncService.getQrCode(accessToken);
 
-    res.status(result.status).json(result);
+    sendSncResult(res, result);
   } catch (error) {
     next(error);
   }

@@ -51,6 +51,10 @@ let currentQrValue = '';
 let currentTransactionType = 'all';
 
 function getApiErrorMessage(result, fallbackMessage) {
+  if (result && result.status === 423) {
+    return 'Профиль найден, но СНК требует заполнить обязательные данные. Нужно уточнить у СНК, какие реквизиты надо передать после регистрации.';
+  }
+
   const data = result && result.data;
 
   if (typeof data === 'string') {
