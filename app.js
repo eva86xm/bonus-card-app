@@ -755,7 +755,7 @@ if (transactionDateFilter) {
     if (dateFilterText) {
       dateFilterText.textContent = transactionDateFilter.value
         ? formatDate(transactionDateFilter.value)
-        : 'Выберите дату';
+        : '📅 Выбрать период';
     }
 
     renderFilteredTransactions();
@@ -763,7 +763,7 @@ if (transactionDateFilter) {
 
   if (filter) {
     filter.addEventListener('click', function (event) {
-      if (event.target === clearDateFilterButton || event.target === transactionDateFilter) {
+      if (event.target === clearDateFilterButton) {
         return;
       }
 
@@ -771,7 +771,10 @@ if (transactionDateFilter) {
 
       if (typeof transactionDateFilter.showPicker === 'function') {
         transactionDateFilter.showPicker();
+        return;
       }
+
+      transactionDateFilter.click();
     });
   }
 }
@@ -783,7 +786,7 @@ if (clearDateFilterButton) {
     transactionDateFilter.value = '';
 
     if (dateFilterText) {
-      dateFilterText.textContent = 'Выберите дату';
+      dateFilterText.textContent = '📅 Выбрать период';
     }
 
     renderFilteredTransactions();

@@ -154,19 +154,18 @@
         <div class="panel-header history-header">
           <h3>История операций</h3>
 
-        <div class="history-filter">
-          <span class="history-filter-label">Поиск по дате</span>
-          <div class="date-picker-control" id="datePickerControl">
-            <span id="dateFilterText">Выберите дату</span>
-            <input id="transactionDateFilter" type="date" aria-label="Выбрать дату операции" />
-          </div>
-          <button type="button" id="clearDateFilterButton" aria-label="Показать все даты">Все</button>
-        </div>
-
         <div class="transaction-type-filter" id="transactionTypeFilter">
           <button type="button" class="active" data-type="all" aria-label="Показать все операции">Все</button>
           <button type="button" data-type="plus" aria-label="Показать начисления">Начисления</button>
           <button type="button" data-type="minus" aria-label="Показать списания">Списания</button>
+        </div>
+
+        <div class="history-filter">
+          <div class="date-picker-control" id="datePickerControl">
+            <span id="dateFilterText">📅 Выбрать период</span>
+            <input id="transactionDateFilter" type="date" aria-label="Выбрать дату операции" />
+          </div>
+          <button type="button" id="clearDateFilterButton" aria-label="Показать все даты">Все</button>
         </div>
         </div>
 
