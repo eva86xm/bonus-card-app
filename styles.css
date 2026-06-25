@@ -2035,15 +2035,6 @@ input:focus-visible,
   cursor: default;
 }
 
-.history-filter-label {
-  grid-column: 1 / -1;
-  padding: 0;
-  color: var(--muted);
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
 .date-picker-control {
   position: relative;
   min-height: 46px;
@@ -2192,10 +2183,6 @@ a:active,
   background: transparent;
 }
 
-.history-filter-label {
-  display: none;
-}
-
 .date-picker-control {
   position: relative;
   min-height: 48px;
@@ -2264,10 +2251,6 @@ a:active,
   align-items: center;
   gap: 12px;
   border-radius: 18px;
-}
-
-.transaction-icon {
-  display: none;
 }
 
 .transaction-item .minus {
@@ -2353,10 +2336,6 @@ a:active,
   .transaction-item {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 10px;
-  }
-
-  .transaction-icon {
-    display: none;
   }
 
   .card-balance strong {
