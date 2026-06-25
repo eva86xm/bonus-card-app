@@ -15,9 +15,7 @@ function createCode(phone) {
 }
 
 async function sendCode(phone, code) {
-  if (shouldExposeDevCode()) {
-    console.log(`SMS code for ${phone}: ${code}`);
-  }
+  return { phone, code };
 }
 
 function verifyCode(phone, code) {

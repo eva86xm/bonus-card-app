@@ -8,7 +8,7 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
-  <link rel="stylesheet" href="styles.css?v=ios14" />
+  <link rel="stylesheet" href="styles.css?v=ios16" />
 
   <meta name="apple-mobile-web-app-title" content="ИНП" />
   <meta name="application-name" content="ИНП" />
@@ -19,7 +19,7 @@
   <main class="app">
     <section class="login-screen" id="loginScreen">
       <div class="brand">
-        <img class="brand-logo" src="logo.png" alt="ИНП" />
+        <img class="brand-logo" src="logo.png" alt="ИНП" decoding="async" />
         <div>
           <h1>ИНП</h1>
           <p>Бонусная и топливная карта</p>
@@ -42,7 +42,7 @@
             required
           />
 
-          <button type="button" id="requestSmsButton">Получить SMS</button>
+          <button type="button" id="requestSmsButton" aria-label="Получить SMS-код">Получить SMS</button>
         </div>
 
         <div class="hidden" id="smsStep">
@@ -56,7 +56,7 @@
             pattern="[0-9]{6}"
           />
 
-          <button type="submit" id="loginButton">Войти</button>
+          <button type="submit" id="loginButton" aria-label="Войти в личный кабинет">Войти</button>
         </div>
 
         <div class="hidden" id="registerStep">
@@ -69,7 +69,7 @@
               autocomplete="tel"
             />
 
-            <button type="button" id="registerSmsButton">
+            <button type="button" id="registerSmsButton" aria-label="Получить SMS для регистрации карты">
               Получить SMS для регистрации
             </button>
           </div>
@@ -85,12 +85,12 @@
               pattern="[0-9]{6}"
             />
 
-            <button type="button" id="confirmRegisterButton">
+            <button type="button" id="confirmRegisterButton" aria-label="Зарегистрировать карту">
               Зарегистрировать карту
             </button>
           </div>
 
-          <button type="button" class="secondary-button" id="backToLoginButton">
+          <button type="button" class="secondary-button" id="backToLoginButton" aria-label="Вернуться ко входу">
             Вернуться ко входу
           </button>
         </div>
@@ -100,7 +100,7 @@
 
       <p class="auth-switch" id="authSwitch">
         Нет карты?
-        <button type="button" class="text-button" id="showRegisterButton">
+        <button type="button" class="text-button" id="showRegisterButton" aria-label="Перейти к регистрации карты">
           Зарегистрировать
         </button>
       </p>
@@ -114,7 +114,7 @@
           <h2 id="clientName">Клиент</h2>
         </div>
 
-        <button type="button" class="ghost-button" id="logoutButton">Выйти</button>
+        <button type="button" class="ghost-button" id="logoutButton" aria-label="Выйти из личного кабинета">Выйти</button>
       </header>
 
       <section class="bonus-card" id="cardSection">
@@ -130,7 +130,7 @@
           </div>
         </div>
 
-        <div class="qr-box" id="qrBox">QR</div>
+        <div class="qr-box" id="qrBox" role="button" tabindex="0" aria-label="Открыть QR-код на весь экран">QR</div>
       </section>
 
       <section class="card-info">
@@ -156,14 +156,17 @@
 
         <div class="history-filter">
           <span class="history-filter-label">Поиск по дате</span>
-          <input id="transactionDateFilter" type="date" />
-          <button type="button" id="clearDateFilterButton">Все</button>
+          <div class="date-picker-control" id="datePickerControl">
+            <span id="dateFilterText">Выберите дату</span>
+            <input id="transactionDateFilter" type="date" aria-label="Выбрать дату операции" />
+          </div>
+          <button type="button" id="clearDateFilterButton" aria-label="Показать все даты">Все</button>
         </div>
 
         <div class="transaction-type-filter" id="transactionTypeFilter">
-          <button type="button" class="active" data-type="all">Все</button>
-          <button type="button" data-type="plus">Начисления</button>
-          <button type="button" data-type="minus">Списания</button>
+          <button type="button" class="active" data-type="all" aria-label="Показать все операции">Все</button>
+          <button type="button" data-type="plus" aria-label="Показать начисления">Начисления</button>
+          <button type="button" data-type="minus" aria-label="Показать списания">Списания</button>
         </div>
         </div>
 
@@ -173,7 +176,7 @@
       <section class="contacts-panel" id="contactsSection">
         <div class="contacts-hero">
           <div class="contacts-logo-wrap">
-            <img class="contacts-logo" src="logo.png" alt="ИНП" />
+            <img class="contacts-logo" src="logo.png" alt="ИНП" loading="lazy" decoding="async" />
           </div>
 
           <div class="contacts-hero-text">
@@ -236,6 +239,7 @@
             <iframe
               id="azsMapFrame"
               data-src="https://yandex.ru/map-widget/v1/?ll=69.055000%2C61.005000&z=11&mode=search&text=%D0%90%D0%97%D0%A1%20%D0%98%D1%80%D1%82%D1%8B%D1%88%D0%BD%D0%B5%D1%84%D1%82%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%20%D0%A5%D0%B0%D0%BD%D1%82%D1%8B-%D0%9C%D0%B0%D0%BD%D1%81%D0%B8%D0%B9%D1%81%D0%BA"
+              loading="lazy"
               referrerpolicy="no-referrer-when-downgrade"
               title="АЗС Иртышнефтепродукт на карте"
             ></iframe>
@@ -289,6 +293,7 @@
           type="button"
           class="ios-tabbar-item active"
           data-target="mainView"
+          aria-label="Открыть карту клиента"
         >
           <span class="tab-icon">▣</span>
           <span>Карта</span>
@@ -298,6 +303,7 @@
           type="button"
           class="ios-tabbar-item"
           data-target="contactsSection"
+          aria-label="Открыть контакты"
         >
           <span class="tab-icon">☎</span>
           <span>Контакты</span>
@@ -307,7 +313,7 @@
 
     <div class="qr-modal hidden" id="qrModal">
       <div class="qr-modal-content">
-        <button type="button" class="qr-modal-close" id="qrModalClose">
+        <button type="button" class="qr-modal-close" id="qrModalClose" aria-label="Закрыть QR-код">
           Закрыть
         </button>
 
@@ -318,7 +324,7 @@
   </main>
 
   <script src="qrcode.min.js"></script>
-  <script src="api.js?v=ios14"></script>
-  <script src="app.js?v=ios14"></script>
+  <script src="api.js?v=ios16"></script>
+  <script src="app.js?v=ios16"></script>
 </body>
 </html>

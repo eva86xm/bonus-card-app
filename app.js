@@ -4,9 +4,11 @@ const requestSmsButton = document.querySelector('#requestSmsButton');
 const azsMapFrame = document.querySelector('#azsMapFrame');
 const mapLoader = document.querySelector('#mapLoader');
 const smsCodeInput = document.querySelector('#smsCodeInput');
+const loginButton = document.querySelector('#loginButton');
 const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
 const transactionDateFilter = document.querySelector('#transactionDateFilter');
+const dateFilterText = document.querySelector('#dateFilterText');
 const clearDateFilterButton = document.querySelector('#clearDateFilterButton');
 const transactionTypeButtons = document.querySelectorAll('#transactionTypeFilter button');
 
@@ -47,6 +49,32 @@ let currentClient = null;
 let currentTransactions = [];
 let currentQrValue = '';
 let currentTransactionType = 'all';
+
+function getApiErrorMessage(result, fallbackMessage) {
+  const data = result && result.data;
+
+  if (typeof data === 'string') {
+    return data;
+  }
+
+  if (typeof data?.data === 'string') {
+    return data.data;
+  }
+
+  if (typeof data?.error === 'string') {
+    return data.error;
+  }
+
+  if (typeof data?.message === 'string') {
+    return data.message;
+  }
+
+  return fallbackMessage;
+}
+
+function normalizeCodeInput(input) {
+  input.value = input.value.replace(/\D/g, '').slice(0, 6);
+}
 
 function showDashboard(client) {
   hideStartupLoader();
@@ -336,7 +364,6 @@ async function loadSncDashboard() {
       status: ownerData.cardInfo?.cardStatus?.currentStatusName || getCardStateName(selectedCard.state),
       loyaltyProgram: 'ИНП',
       balance: formatNumber(selectedCard.balance || 0),
-      available: formatNumber(selectedCard.balance || 0),
       qrValue,
       transactions: sortedTransactions.map(mapSncTransaction)
     };
@@ -447,6 +474,11 @@ phoneInput.addEventListener('input', function () {
   showLoginMessage('');
 });
 
+smsCodeInput.addEventListener('input', function () {
+  normalizeCodeInput(smsCodeInput);
+  showLoginMessage('');
+});
+
 phoneInput.addEventListener('keydown', function (event) {
   if (event.key !== 'Enter') {
     return;
@@ -485,10 +517,10 @@ requestSmsButton.addEventListener('click', async function () {
       return;
     }
 
-    const message = result.data?.data || result.data?.error || 'Не удалось отправить SMS';
+    const message = getApiErrorMessage(result, 'Не удалось отправить SMS');
     showLoginMessage(message);
   } catch {
-    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+    showLoginMessage('Нет связи с сервером. Проверьте интернет.');
   } finally {
     requestSmsButton.disabled = false;
     requestSmsButton.textContent = 'Получить SMS';
@@ -512,12 +544,14 @@ loginForm.addEventListener('submit', async function (event) {
   }
 
   showLoginMessage('Проверяем код...');
+  loginButton.disabled = true;
+  loginButton.textContent = 'Входим...';
 
   try {
     const result = await backendApi.login(sncApi.normalizePhone(phone), code);
 
     if (!result.ok) {
-      const message = result.data?.data || result.data?.error || 'Не удалось войти';
+      const message = getApiErrorMessage(result, 'Не удалось войти');
       showLoginMessage(message);
       return;
     }
@@ -530,7 +564,10 @@ loginForm.addEventListener('submit', async function (event) {
 
     await loadSncDashboard();
   } catch {
-    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+    showLoginMessage('Нет связи с сервером. Проверьте интернет.');
+  } finally {
+    loginButton.disabled = false;
+    loginButton.textContent = 'Войти';
   }
 });
 
@@ -539,6 +576,16 @@ logoutButton.addEventListener('click', function () {
 });
 
 qrBox.addEventListener('click', openQrModal);
+
+qrBox.addEventListener('keydown', function (event) {
+  if (event.key !== 'Enter' && event.key !== ' ') {
+    return;
+  }
+
+  event.preventDefault();
+  openQrModal();
+});
+
 qrModalClose.addEventListener('click', closeQrModal);
 
 qrModal.addEventListener('click', function (event) {
@@ -564,6 +611,11 @@ backToLoginButton.addEventListener('click', function () {
 
 registerPhoneInput.addEventListener('input', function () {
   registerPhoneInput.value = formatPhone(registerPhoneInput.value);
+  showLoginMessage('');
+});
+
+registerCodeInput.addEventListener('input', function () {
+  normalizeCodeInput(registerCodeInput);
   showLoginMessage('');
 });
 
@@ -596,10 +648,10 @@ registerSmsButton.addEventListener('click', async function () {
       return;
     }
 
-    const message = result.data?.data || result.data?.error || 'Не удалось отправить SMS';
+    const message = getApiErrorMessage(result, 'Не удалось отправить SMS');
     showLoginMessage(message);
   } catch {
-    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+    showLoginMessage('Нет связи с сервером. Проверьте интернет.');
   } finally {
     registerSmsButton.disabled = false;
     registerSmsButton.textContent = 'Получить SMS для регистрации';
@@ -623,7 +675,7 @@ confirmRegisterButton.addEventListener('click', async function () {
     const result = await backendApi.confirmRegisterCard(phone, code);
 
     if (!result.ok) {
-      const message = result.data?.data || result.data?.error || 'Не удалось зарегистрировать карту';
+      const message = getApiErrorMessage(result, 'Не удалось зарегистрировать карту');
       showLoginMessage(message);
       return;
     }
@@ -637,7 +689,7 @@ confirmRegisterButton.addEventListener('click', async function () {
 
     registerCodeInput.value = '';
   } catch {
-    showLoginMessage('Backend не отвечает. Проверьте, запущен ли сервер.');
+    showLoginMessage('Нет связи с сервером. Проверьте интернет.');
   } finally {
     confirmRegisterButton.disabled = false;
     confirmRegisterButton.textContent = 'Зарегистрировать карту';
@@ -647,6 +699,11 @@ confirmRegisterButton.addEventListener('click', async function () {
 function showDashboardTab(target, shouldScroll = true) {
   const isContacts = target === 'contactsSection';
   const previousTab = localStorage.getItem('activeDashboardTab') || 'mainView';
+
+  if (target === previousTab && shouldScroll) {
+    return;
+  }
+
   const direction = previousTab === 'mainView' && isContacts ? 'slide-left' : 'slide-right';
 
   dashboard.classList.remove('slide-left', 'slide-right');
@@ -679,6 +736,10 @@ if (azsMapFrame && mapLoader) {
 
 tabbarItems.forEach(function (item) {
   item.addEventListener('click', function () {
+    if (item.classList.contains('active')) {
+      return;
+    }
+
     showDashboardTab(item.dataset.target);
   });
 });
@@ -687,14 +748,28 @@ if (transactionDateFilter) {
   const filter = transactionDateFilter.closest('.history-filter');
 
   transactionDateFilter.addEventListener('change', function () {
-    if (filter) {
-      filter.dataset.date = transactionDateFilter.value
+    if (dateFilterText) {
+      dateFilterText.textContent = transactionDateFilter.value
         ? formatDate(transactionDateFilter.value)
-        : '';
+        : 'Выберите дату';
     }
 
     renderFilteredTransactions();
   });
+
+  if (filter) {
+    filter.addEventListener('click', function (event) {
+      if (event.target === clearDateFilterButton || event.target === transactionDateFilter) {
+        return;
+      }
+
+      transactionDateFilter.focus();
+
+      if (typeof transactionDateFilter.showPicker === 'function') {
+        transactionDateFilter.showPicker();
+      }
+    });
+  }
 }
 
 if (clearDateFilterButton) {
@@ -703,8 +778,8 @@ if (clearDateFilterButton) {
 
     transactionDateFilter.value = '';
 
-    if (filter) {
-      filter.dataset.date = '';
+    if (dateFilterText) {
+      dateFilterText.textContent = 'Выберите дату';
     }
 
     renderFilteredTransactions();

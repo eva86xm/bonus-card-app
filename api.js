@@ -7,7 +7,6 @@ const sncApi = {
       status: 'Активна',
       loyaltyProgram: 'Бонусная программа АЗС',
       balance: 1280,
-      available: 640,
       transactions: [
         {
           date: '18.06.2026',
@@ -39,7 +38,6 @@ const sncApi = {
       status: 'Активна',
       loyaltyProgram: 'Премиальная программа',
       balance: 3420,
-      available: 1200,
       transactions: [
         {
           date: '17.06.2026',
@@ -64,7 +62,6 @@ const sncApi = {
       status: 'Заблокирована',
       loyaltyProgram: 'Бонусная программа АЗС',
       balance: 215,
-      available: 0,
       transactions: [
         {
           date: '08.06.2026',
@@ -136,6 +133,38 @@ sncApi.saveClients = function () {
   localStorage.setItem('sncClients', JSON.stringify(this.clients));
 };
 
+const API_REQUEST_TIMEOUT = 15000;
+const API_REFRESH_TIMEOUT = 25000;
+
+function parseResponseText(text) {
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {
+      data: text,
+      error: text
+    };
+  }
+}
+
+function createRequestError(error) {
+  const isTimeout = error && error.name === 'AbortError';
+
+  return {
+    ok: false,
+    status: 0,
+    data: {
+      error: isTimeout
+        ? 'Сервер долго не отвечает. Попробуйте еще раз.'
+        : 'Нет связи с сервером. Проверьте интернет.'
+    }
+  };
+}
+
 const backendApi = {
   baseUrl: ['localhost', '127.0.0.1'].includes(window.location.hostname)
     ? 'http://localhost:3000'
@@ -144,56 +173,75 @@ const backendApi = {
   refreshPromise: null,
 
   async request(path, options = {}, shouldRetry = true) {
-    const response = await fetch(`${this.baseUrl}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-      }
-    });
+    const {
+      timeout = API_REQUEST_TIMEOUT,
+      headers = {},
+      ...fetchOptions
+    } = options;
 
-    const data = await response.json();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(function () {
+      controller.abort();
+    }, timeout);
 
-    const result = response.ok
-      ? data
-      : {
+    try {
+      const response = await fetch(`${this.baseUrl}${path}`, {
+        ...fetchOptions,
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          ...headers
+        }
+      });
+
+      const responseText = await response.text();
+      const parsedData = parseResponseText(responseText);
+
+      const result = response.ok
+        ? (parsedData || { ok: true, status: response.status, data: null })
+        : {
+            ok: false,
+            status: response.status,
+            data: parsedData
+          };
+
+      const status = result.status || response.status;
+
+      if (shouldRetry && status === 401) {
+        const refreshed = await this.refreshSessionOnce();
+
+        if (refreshed) {
+          const retryOptions = {
+            ...options,
+            headers: {
+              ...headers
+            }
+          };
+
+          if (retryOptions.headers.Authorization) {
+            retryOptions.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`;
+          }
+
+          return this.request(path, retryOptions, false);
+        }
+
+        this.clearSession();
+
+        return {
           ok: false,
-          status: response.status,
-          data
-        };
-
-    const status = result.status || response.status;
-
-    if (shouldRetry && status === 401) {
-      const refreshed = await this.refreshSessionOnce();
-
-      if (refreshed) {
-        const retryOptions = {
-          ...options,
-          headers: {
-            ...(options.headers || {})
+          status: 401,
+          data: {
+            error: 'Сессия устарела. Войдите заново.'
           }
         };
-
-        if (retryOptions.headers.Authorization) {
-          retryOptions.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`;
-        }
-
-        return this.request(path, retryOptions, false);
       }
 
-      this.clearSession();
-
-      return {
-        ok: false,
-        status: 401,
-        data: {
-          error: 'Сессия устарела. Войдите заново.'
-        }
-      };
+      return result;
+    } catch (error) {
+      return createRequestError(error);
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    return result;
   },
 
   async refreshSession() {
@@ -204,17 +252,13 @@ const backendApi = {
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/api/snc/refresh`, {
+      const result = await this.request('/api/snc/refresh', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refreshToken })
-      });
+        body: JSON.stringify({ refreshToken }),
+        timeout: API_REFRESH_TIMEOUT
+      }, false);
 
-      const result = await response.json();
-
-      if (!response.ok || !result.ok) {
+      if (!result.ok) {
         return false;
       }
 
