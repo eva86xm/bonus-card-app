@@ -9,7 +9,6 @@ const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
 const transactionDateFilter = document.querySelector('#transactionDateFilter');
 const dateFilterText = document.querySelector('#dateFilterText');
-const clearDateFilterButton = document.querySelector('#clearDateFilterButton');
 const transactionTypeButtons = document.querySelectorAll('#transactionTypeFilter button');
 
 const registerStep = document.querySelector('#registerStep');
@@ -26,8 +25,6 @@ const loginMessage = document.querySelector('#loginMessage');
 const loginScreen = document.querySelector('#loginScreen');
 const startupLoader = document.querySelector('#startupLoader');
 const dashboard = document.querySelector('#dashboard');
-const logoutButton = document.querySelector('#logoutButton');
-
 const tabbarItems = document.querySelectorAll('.ios-tabbar-item');
 
 const clientName = document.querySelector('#clientName');
@@ -213,9 +210,9 @@ function renderFilteredTransactions() {
     item.className = 'transaction-item';
 
     item.innerHTML = `
-      <div>
+      <div class="transaction-main">
         <strong>${transaction.title}</strong>
-        <p>${transaction.place} · ${transaction.displayDate || transaction.date}</p>
+        <small>${transaction.displayDate || transaction.date}</small>
       </div>
       <span class="${transaction.type}">${transaction.amount}</span>
     `;
@@ -611,10 +608,6 @@ loginForm.addEventListener('submit', async function (event) {
   }
 });
 
-logoutButton.addEventListener('click', function () {
-  showLogin();
-});
-
 profileLogoutButton.addEventListener('click', function () {
   showLogin();
 });
@@ -804,11 +797,7 @@ if (transactionDateFilter) {
   });
 
   if (filter) {
-    filter.addEventListener('click', function (event) {
-      if (event.target === clearDateFilterButton) {
-        return;
-      }
-
+    filter.addEventListener('click', function () {
       transactionDateFilter.focus();
 
       if (typeof transactionDateFilter.showPicker === 'function') {
@@ -819,20 +808,6 @@ if (transactionDateFilter) {
       transactionDateFilter.click();
     });
   }
-}
-
-if (clearDateFilterButton) {
-  clearDateFilterButton.addEventListener('click', function () {
-    const filter = transactionDateFilter.closest('.history-filter');
-
-    transactionDateFilter.value = '';
-
-    if (dateFilterText) {
-      dateFilterText.textContent = '📅 Выбрать период';
-    }
-
-    renderFilteredTransactions();
-  });
 }
 
 transactionTypeButtons.forEach(function (button) {

@@ -113,8 +113,6 @@
           <p class="eyebrow">Личный кабинет</p>
           <h2 id="clientName">Клиент</h2>
         </div>
-
-        <button type="button" class="ghost-button" id="logoutButton" aria-label="Выйти из личного кабинета">Выйти</button>
       </header>
 
       <section class="bonus-card" id="cardSection">
@@ -166,7 +164,6 @@
             <span id="dateFilterText">📅 Выбрать период</span>
             <input id="transactionDateFilter" type="date" aria-label="Выбрать дату операции" />
           </div>
-          <button type="button" id="clearDateFilterButton" aria-label="Показать все даты">Все</button>
         </div>
         </div>
 
@@ -187,13 +184,6 @@
           <div class="hero-actions">
             <a href="tel:+73467327714">Позвонить</a>
             <a href="mailto:irtishoil@mail.ru">Написать</a>
-            <a
-              href="https://yandex.ru/maps/?text=Иртышнефтепродукт%20Ханты-Мансийск"
-              target="_blank"
-              rel="noopener"
-            >
-              Маршрут
-            </a>
           </div>
         </div>
 
@@ -231,26 +221,18 @@
             <p>3 адреса в Ханты-Мансийске</p>
           </div>
 
+          <a
+            class="nearest-station-button"
+            href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20рядом"
+            target="_blank"
+            rel="noopener"
+          >
+            Ближайшая АЗС
+          </a>
+
           <div class="azs-map">
             <div class="map-loader" id="mapLoader">
               Загружаем карту...
-            </div>
-
-            <div class="map-actions" aria-label="Быстрые действия с картой">
-              <a
-                href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20рядом"
-                target="_blank"
-                rel="noopener"
-              >
-                Ближайшая АЗС
-              </a>
-              <a
-                href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20Ханты-Мансийск"
-                target="_blank"
-                rel="noopener"
-              >
-                Яндекс Карты
-              </a>
             </div>
 
             <iframe
@@ -263,44 +245,26 @@
           </div>
 
           <div class="azs-list compact-azs-list">
-            <a
-              class="azs-row"
-              href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Строителей%2C%201А"
-              target="_blank"
-              rel="noopener"
-            >
+            <div class="azs-row">
               <div>
                 <strong>АЗС на Строителей</strong>
                 <span>ул. Строителей, 1А</span>
               </div>
-              <em>Маршрут</em>
-            </a>
+            </div>
 
-            <a
-              class="azs-row"
-              href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Студенческая%2C%2033"
-              target="_blank"
-              rel="noopener"
-            >
+            <div class="azs-row">
               <div>
                 <strong>АЗС на Студенческой</strong>
                 <span>ул. Студенческая, 33</span>
               </div>
-              <em>Маршрут</em>
-            </a>
+            </div>
 
-            <a
-              class="azs-row"
-              href="https://yandex.ru/maps/?text=г.%20Ханты-Мансийск%2C%20ул.%20Объездная%2C%2065"
-              target="_blank"
-              rel="noopener"
-            >
+            <div class="azs-row">
               <div>
                 <strong>АЗС на Объездной</strong>
                 <span>ул. Объездная, 65</span>
               </div>
-              <em>Маршрут</em>
-            </a>
+            </div>
           </div>
         </div>
       </section>

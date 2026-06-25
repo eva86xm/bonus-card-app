@@ -784,13 +784,6 @@ p {
   font-size: 15px;
 }
 
-.azs-row em {
-  color: var(--brand-green);
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-}
-
 .ios-tabbar {
   position: fixed;
   left: 50%;
@@ -1090,9 +1083,6 @@ p {
     gap: 8px;
   }
 
-  .azs-row em {
-    width: fit-content;
-  }
 }
 
 @media (max-width: 520px) {
@@ -2061,18 +2051,6 @@ input:focus-visible,
   cursor: pointer;
 }
 
-.history-filter button {
-  min-width: 72px;
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 15px;
-  background: #dcefe9;
-  color: var(--brand-green);
-  font-size: 16px;
-  font-weight: 800;
-  box-shadow: none;
-}
-
 .transactions {
   overscroll-behavior: contain;
 }
@@ -2088,10 +2066,6 @@ input:focus-visible,
 @media (max-width: 420px) {
   .history-filter {
     grid-template-columns: 1fr;
-  }
-
-  .history-filter button {
-    width: 100%;
   }
 
   .contacts-hero h3 {
@@ -2212,12 +2186,6 @@ a:active,
   cursor: pointer;
 }
 
-.history-filter button {
-  min-height: 48px;
-  min-width: 70px;
-  border-radius: var(--radius-control);
-}
-
 .card-balance {
   padding: 14px 18px;
   border-radius: 20px;
@@ -2313,12 +2281,11 @@ a:active,
   }
 
   .history-filter {
-    grid-template-columns: minmax(0, 1fr) 64px;
+    grid-template-columns: minmax(0, 1fr);
     gap: 8px;
   }
 
-  .date-picker-control,
-  .history-filter button {
+  .date-picker-control {
     min-height: 46px;
     font-size: 14px;
   }
@@ -2394,40 +2361,6 @@ a:active,
 
 .azs-map {
   position: relative;
-}
-
-.map-actions {
-  position: absolute;
-  left: 14px;
-  right: 14px;
-  bottom: 14px;
-  z-index: 3;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  pointer-events: none;
-}
-
-.map-actions a {
-  min-height: 44px;
-  display: grid;
-  place-items: center;
-  padding: 0 12px;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--brand-green);
-  font-size: 14px;
-  font-weight: 800;
-  text-decoration: none;
-  box-shadow: 0 12px 26px rgba(17, 24, 39, 0.12);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  pointer-events: auto;
-}
-
-.map-actions a:first-child {
-  background: rgba(15, 107, 87, 0.92);
-  color: #ffffff;
 }
 
 .contact-row::after {
@@ -2555,6 +2488,10 @@ a:active,
   width: min(520px, calc(100% - 28px));
 }
 
+.hero-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media (max-width: 520px) {
   .transactions {
     max-height: 276px;
@@ -2563,15 +2500,6 @@ a:active,
   .transaction-item {
     min-height: 62px;
     padding: 12px 13px;
-  }
-
-  .map-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .map-actions a {
-    min-height: 42px;
-    font-size: 13px;
   }
 
   .profile-card {
@@ -2603,5 +2531,180 @@ a:active,
 
   .ios-tabbar-item {
     padding-inline: 6px;
+  }
+}
+
+/* Contacts layout repair */
+.contacts-panel {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+  gap: 24px;
+}
+
+.contacts-hero {
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 18px;
+  padding: 22px;
+}
+
+.contacts-hero h3 {
+  max-width: 100%;
+  font-size: clamp(24px, 4.6vw, 32px);
+  line-height: 1.08;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contacts-hero-text {
+  min-width: 0;
+}
+
+.hero-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nearest-station-button {
+  min-height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: var(--brand-green);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 12px 26px rgba(15, 107, 87, 0.14);
+}
+
+.azs-map {
+  height: clamp(320px, 48vw, 430px);
+}
+
+.contact-row::after {
+  width: 36px;
+  height: 36px;
+  right: 16px;
+}
+
+.azs-row {
+  min-height: 58px;
+}
+
+@media (max-width: 520px) {
+  .contacts-panel {
+    max-width: none;
+    gap: 22px;
+  }
+
+  .contacts-hero {
+    grid-template-columns: 58px minmax(0, 1fr);
+    padding: 18px;
+  }
+
+  .contacts-logo-wrap,
+  .contacts-logo {
+    width: 54px;
+    height: 54px;
+    border-radius: 17px;
+  }
+
+  .contacts-hero h3 {
+    font-size: clamp(20px, 5.4vw, 25px);
+  }
+
+  .hero-actions {
+    gap: 8px;
+  }
+
+  .azs-map {
+    height: 330px;
+  }
+
+  .azs-row {
+    padding: 14px;
+  }
+}
+
+/* Final history polish */
+.history-filter {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.date-picker-control {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 16px;
+  border-radius: var(--radius-control);
+  background: #f4f6f9;
+}
+
+.date-picker-control input[type="date"] {
+  z-index: 4;
+}
+
+.transactions {
+  gap: 8px;
+  max-height: 292px;
+}
+
+.transaction-item {
+  min-height: 58px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #f7f8fa;
+  box-shadow: none;
+}
+
+.transaction-main {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.transaction-main strong {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.transaction-main p,
+.transaction-main small {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.22;
+}
+
+.transaction-main small {
+  color: #8a95a3;
+}
+
+.transaction-item span {
+  align-self: center;
+  font-size: 17px;
+}
+
+@media (max-width: 520px) {
+  .transaction-item {
+    min-height: 56px;
+    padding: 11px 13px;
+  }
+
+  .transaction-main strong {
+    font-size: 15px;
+  }
+
+  .transaction-main p,
+  .transaction-main small {
+    font-size: 13px;
   }
 }
