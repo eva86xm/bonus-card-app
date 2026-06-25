@@ -2342,3 +2342,266 @@ a:active,
     font-size: clamp(34px, 10vw, 40px);
   }
 }
+
+/* Final product polish: compact history, map actions, profile tab */
+.bonus-card {
+  isolation: isolate;
+}
+
+.card-watermark {
+  position: absolute;
+  right: 24px;
+  bottom: -20px;
+  z-index: 0;
+  color: rgba(255, 255, 255, 0.08);
+  font-size: clamp(90px, 20vw, 150px);
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.bonus-card > div {
+  position: relative;
+  z-index: 1;
+}
+
+.transactions {
+  gap: 8px;
+  max-height: 286px;
+}
+
+.transaction-item {
+  min-height: 64px;
+  padding: 12px 14px;
+  border-radius: 16px;
+}
+
+.transaction-item strong {
+  margin-bottom: 4px;
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.transaction-item p {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.transaction-item span {
+  font-size: 16px;
+}
+
+.azs-map {
+  position: relative;
+}
+
+.map-actions {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  pointer-events: none;
+}
+
+.map-actions a {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--brand-green);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 12px 26px rgba(17, 24, 39, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  pointer-events: auto;
+}
+
+.map-actions a:first-child {
+  background: rgba(15, 107, 87, 0.92);
+  color: #ffffff;
+}
+
+.contact-row::after {
+  content: "TEL";
+  width: 38px;
+  height: 38px;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.contact-row.mail::after {
+  content: "@";
+  font-size: 18px;
+}
+
+.contacts-hero h3 {
+  max-width: 100%;
+  font-size: clamp(20px, 4.7vw, 30px);
+  white-space: nowrap;
+}
+
+.profile-panel {
+  display: none;
+  gap: 18px;
+  padding-bottom: max(152px, calc(env(safe-area-inset-bottom) + 138px));
+}
+
+.profile-card {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 16px;
+  align-items: center;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: var(--brand-green-soft);
+  color: var(--brand-green);
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.profile-card h3 {
+  color: var(--text);
+  font-size: clamp(28px, 6vw, 36px);
+  line-height: 1.05;
+  font-weight: 900;
+}
+
+.profile-card p:not(.contacts-kicker) {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.profile-list {
+  display: grid;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.profile-row {
+  display: grid;
+  gap: 5px;
+  padding: 18px;
+}
+
+.profile-row + .profile-row {
+  border-top: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+.profile-row span {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.profile-row strong {
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.profile-logout {
+  margin: 14px;
+  background: #fff1f0;
+  color: #d94b3d;
+  box-shadow: none;
+}
+
+#profileSection {
+  display: none;
+}
+
+.dashboard.show-profile #cardSection,
+.dashboard.show-profile .card-info,
+.dashboard.show-profile #historySection,
+.dashboard.show-profile #contactsSection {
+  display: none;
+}
+
+.dashboard.show-profile #profileSection {
+  display: grid;
+  animation: softOpen 0.22s ease-out;
+}
+
+.dashboard.show-contacts #profileSection {
+  display: none;
+}
+
+.ios-tabbar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(520px, calc(100% - 28px));
+}
+
+@media (max-width: 520px) {
+  .transactions {
+    max-height: 276px;
+  }
+
+  .transaction-item {
+    min-height: 62px;
+    padding: 12px 13px;
+  }
+
+  .map-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .map-actions a {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .profile-card {
+    grid-template-columns: 56px 1fr;
+    padding: 18px;
+  }
+
+  .profile-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    font-size: 24px;
+  }
+
+  .contacts-hero {
+    grid-template-columns: 64px 1fr;
+  }
+
+  .contacts-logo-wrap,
+  .contacts-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+  }
+
+  .contacts-hero h3 {
+    font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .ios-tabbar-item {
+    padding-inline: 6px;
+  }
+}

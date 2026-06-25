@@ -118,6 +118,7 @@
       </header>
 
       <section class="bonus-card" id="cardSection">
+        <span class="card-watermark" aria-hidden="true">ИНП</span>
         <div>
           <p class="card-label">Бонусная карта</p>
           <h3 id="cardNumber">0000 0000 0000</h3>
@@ -235,6 +236,23 @@
               Загружаем карту...
             </div>
 
+            <div class="map-actions" aria-label="Быстрые действия с картой">
+              <a
+                href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20рядом"
+                target="_blank"
+                rel="noopener"
+              >
+                Ближайшая АЗС
+              </a>
+              <a
+                href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20Ханты-Мансийск"
+                target="_blank"
+                rel="noopener"
+              >
+                Яндекс Карты
+              </a>
+            </div>
+
             <iframe
               id="azsMapFrame"
               data-src="https://yandex.ru/map-widget/v1/?ll=69.055000%2C61.005000&z=11&mode=search&text=%D0%90%D0%97%D0%A1%20%D0%98%D1%80%D1%82%D1%8B%D1%88%D0%BD%D0%B5%D1%84%D1%82%D0%B5%D0%BF%D1%80%D0%BE%D0%B4%D1%83%D0%BA%D1%82%20%D0%A5%D0%B0%D0%BD%D1%82%D1%8B-%D0%9C%D0%B0%D0%BD%D1%81%D0%B8%D0%B9%D1%81%D0%BA"
@@ -287,6 +305,29 @@
         </div>
       </section>
 
+      <section class="profile-panel" id="profileSection">
+        <div class="profile-card">
+          <div class="profile-avatar" aria-hidden="true">И</div>
+          <div>
+            <p class="contacts-kicker">Профиль</p>
+            <h3 id="profileName">Клиент</h3>
+            <p>Настройки личного кабинета</p>
+          </div>
+        </div>
+
+        <div class="profile-list compact-list">
+          <div class="profile-row">
+            <span>Карта</span>
+            <strong id="profileCardNumber">0000 0000 0000</strong>
+          </div>
+          <div class="profile-row">
+            <span>Статус</span>
+            <strong id="profileCardStatus">Активна</strong>
+          </div>
+          <button type="button" class="profile-logout" id="profileLogoutButton">Выйти из кабинета</button>
+        </div>
+      </section>
+
       <nav class="ios-tabbar" aria-label="Навигация">
         <button
           type="button"
@@ -304,8 +345,18 @@
           data-target="contactsSection"
           aria-label="Открыть контакты"
         >
-          <span class="tab-icon">☎</span>
+          <span class="tab-icon">i</span>
           <span>Контакты</span>
+        </button>
+
+        <button
+          type="button"
+          class="ios-tabbar-item"
+          data-target="profileSection"
+          aria-label="Открыть профиль"
+        >
+          <span class="tab-icon">●</span>
+          <span>Профиль</span>
         </button>
       </nav>
     </section>

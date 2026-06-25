@@ -37,6 +37,10 @@ const loyaltyProgram = document.querySelector('#loyaltyProgram');
 const cardOwner = document.querySelector('#cardOwner');
 const lastOperation = document.querySelector('#lastOperation');
 const bonusBalance = document.querySelector('#bonusBalance');
+const profileName = document.querySelector('#profileName');
+const profileCardNumber = document.querySelector('#profileCardNumber');
+const profileCardStatus = document.querySelector('#profileCardStatus');
+const profileLogoutButton = document.querySelector('#profileLogoutButton');
 
 const qrBox = document.querySelector('#qrBox');
 const qrModal = document.querySelector('#qrModal');
@@ -101,6 +105,9 @@ function showDashboard(client) {
   lastOperation.textContent = client.transactions[0]?.date || '—';
 
   bonusBalance.textContent = client.balance;
+  profileName.textContent = client.name;
+  profileCardNumber.textContent = client.cardNumber;
+  profileCardStatus.textContent = client.status;
 
   currentQrValue = client.qrValue || client.cardNumber.replace(/\s/g, '');
 
@@ -208,7 +215,7 @@ function renderFilteredTransactions() {
     item.innerHTML = `
       <div>
         <strong>${transaction.title}</strong>
-        <p>${transaction.date} · ${transaction.place}</p>
+        <p>${transaction.place} · ${transaction.displayDate || transaction.date}</p>
       </div>
       <span class="${transaction.type}">${transaction.amount}</span>
     `;
@@ -399,7 +406,8 @@ function mapSncTransaction(transaction) {
   return {
     rawDate: getDateInputValue(transaction.date),
     date: formatDate(transaction.date),
-    place: transaction.nameAzs || transaction.division || 'АЗС',
+    displayDate: formatFriendlyDate(transaction.date),
+    place: formatStationName(transaction.nameAzs || transaction.division || 'АЗС'),
     title: transaction.resourceName || 'Операция по карте',
     amount: bonusOut > 0 ? `-${formatNumber(bonusOut)}` : `+${formatNumber(bonusIn)}`,
     type: bonusOut > 0 ? 'minus' : 'plus'
@@ -430,6 +438,34 @@ function formatDate(value) {
   }
 
   return date.toLocaleDateString('ru-RU');
+}
+
+function formatFriendlyDate(value) {
+  if (!value) {
+    return '—';
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long'
+  });
+}
+
+function formatStationName(value) {
+  const text = String(value || '').trim();
+  const match = text.match(/АЗС\s*(\d+)/i);
+
+  if (match) {
+    return `АЗС №${match[1]}`;
+  }
+
+  return text || 'АЗС';
 }
 
 function getDateInputValue(value) {
@@ -579,6 +615,10 @@ logoutButton.addEventListener('click', function () {
   showLogin();
 });
 
+profileLogoutButton.addEventListener('click', function () {
+  showLogin();
+});
+
 qrBox.addEventListener('click', openQrModal);
 
 qrBox.addEventListener('keydown', function (event) {
@@ -702,6 +742,7 @@ confirmRegisterButton.addEventListener('click', async function () {
 
 function showDashboardTab(target, shouldScroll = true) {
   const isContacts = target === 'contactsSection';
+  const isProfile = target === 'profileSection';
   const previousTab = localStorage.getItem('activeDashboardTab') || 'mainView';
 
   if (target === previousTab && shouldScroll) {
@@ -714,6 +755,7 @@ function showDashboardTab(target, shouldScroll = true) {
   dashboard.classList.add(direction);
 
   dashboard.classList.toggle('show-contacts', isContacts);
+  dashboard.classList.toggle('show-profile', isProfile);
 
   tabbarItems.forEach(function (tab) {
     tab.classList.toggle('active', tab.dataset.target === target);
