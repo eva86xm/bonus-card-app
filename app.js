@@ -664,20 +664,6 @@ tabbarItems.forEach(function (item) {
 if (transactionDateFilter) {
   const filter = transactionDateFilter.closest('.history-filter');
 
-  if (filter) {
-    filter.addEventListener('click', function (event) {
-      if (event.target === clearDateFilterButton) {
-        return;
-      }
-
-      if (transactionDateFilter.showPicker) {
-        transactionDateFilter.showPicker();
-      } else {
-        transactionDateFilter.click();
-      }
-    });
-  }
-
   transactionDateFilter.addEventListener('change', function () {
     if (filter) {
       filter.dataset.date = transactionDateFilter.value

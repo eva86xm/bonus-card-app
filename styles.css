@@ -1977,3 +1977,27 @@ body {
     font-size: 17px;
   }
 }
+
+.history-filter {
+  position: static;
+  cursor: default;
+}
+
+.history-filter::after {
+  content: none;
+}
+
+.history-filter input[type="date"] {
+  position: static;
+  width: 100%;
+  height: 44px;
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+.history-filter button {
+  z-index: 1;
+}
