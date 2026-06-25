@@ -8,6 +8,7 @@ const phoneStep = document.querySelector('#phoneStep');
 const smsStep = document.querySelector('#smsStep');
 const transactionDateFilter = document.querySelector('#transactionDateFilter');
 const clearDateFilterButton = document.querySelector('#clearDateFilterButton');
+const transactionTypeButtons = document.querySelectorAll('#transactionTypeFilter button');
 
 const registerStep = document.querySelector('#registerStep');
 const registerPhoneStep = document.querySelector('#registerPhoneStep');
@@ -45,6 +46,7 @@ const transactionsList = document.querySelector('#transactionsList');
 let currentClient = null;
 let currentTransactions = [];
 let currentQrValue = '';
+let currentTransactionType = 'all';
 
 function showDashboard(client) {
   hideStartupLoader();
@@ -92,8 +94,8 @@ function renderLargeQrCode(value) {
 
   new QRCode(qrModalBox, {
     text: value,
-    width: 240,
-    height: 240,
+    width: 300,
+    height: 300,
     colorDark: '#0a332e',
     colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.H
@@ -105,11 +107,13 @@ function openQrModal() {
 
   renderLargeQrCode(currentQrValue);
   qrModal.classList.remove('hidden');
+  document.body.classList.add('qr-modal-open');
 }
 
 function closeQrModal() {
   qrModal.classList.add('hidden');
   qrModalBox.innerHTML = '';
+  document.body.classList.remove('qr-modal-open');
 }
 
 function showLogin() {
@@ -149,8 +153,19 @@ function renderFilteredTransactions() {
     });
   }
 
+  if (currentTransactionType !== 'all') {
+    transactions = transactions.filter(function (transaction) {
+      return transaction.type === currentTransactionType;
+    });
+  }
+
   if (!transactions.length) {
-    transactionsList.innerHTML = '<p class="empty-text">Операций за эту дату нет</p>';
+    transactionsList.innerHTML = `
+      <div class="empty-state">
+        <strong>Пока нет операций</strong>
+        <p>После первой покупки здесь появится история.</p>
+      </div>
+    `;
     return;
   }
 
@@ -200,6 +215,7 @@ function formatPhone(value) {
 
 function showLoginMessage(message) {
   loginMessage.textContent = message;
+  loginMessage.classList.toggle('hidden', !message);
 }
 
 function showStartupLoader() {
@@ -329,7 +345,7 @@ async function loadSncDashboard() {
   } catch (error) {
     backendApi.clearSession();
     showLogin();
-    showLoginMessage('Сессия устарела. Войдите еще раз.');
+    showLoginMessage('Нет связи с сервером. Проверьте интернет и войдите еще раз.');
   }
 }
 
@@ -531,6 +547,12 @@ qrModal.addEventListener('click', function (event) {
   }
 });
 
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape' && !qrModal.classList.contains('hidden')) {
+    closeQrModal();
+  }
+});
+
 showRegisterButton.addEventListener('click', function () {
   showRegisterStep();
 });
@@ -688,6 +710,18 @@ if (clearDateFilterButton) {
     renderFilteredTransactions();
   });
 }
+
+transactionTypeButtons.forEach(function (button) {
+  button.addEventListener('click', function () {
+    currentTransactionType = button.dataset.type || 'all';
+
+    transactionTypeButtons.forEach(function (item) {
+      item.classList.toggle('active', item === button);
+    });
+
+    renderFilteredTransactions();
+  });
+});
 
 async function restoreSession() {
   const refreshToken = localStorage.getItem('refreshToken');

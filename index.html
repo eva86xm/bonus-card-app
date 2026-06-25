@@ -8,7 +8,7 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
-  <link rel="stylesheet" href="styles.css?v=ios13" />
+  <link rel="stylesheet" href="styles.css?v=ios14" />
 
   <meta name="apple-mobile-web-app-title" content="ИНП" />
   <meta name="application-name" content="ИНП" />
@@ -159,6 +159,12 @@
           <input id="transactionDateFilter" type="date" />
           <button type="button" id="clearDateFilterButton">Все</button>
         </div>
+
+        <div class="transaction-type-filter" id="transactionTypeFilter">
+          <button type="button" class="active" data-type="all">Все</button>
+          <button type="button" data-type="plus">Начисления</button>
+          <button type="button" data-type="minus">Списания</button>
+        </div>
         </div>
 
         <div class="transactions" id="transactionsList"></div>
@@ -305,13 +311,14 @@
           Закрыть
         </button>
 
+        <p class="qr-modal-title">Покажите QR оператору</p>
         <div class="qr-modal-box" id="qrModalBox"></div>
       </div>
     </div>
   </main>
 
   <script src="qrcode.min.js"></script>
-  <script src="api.js?v=ios13"></script>
-  <script src="app.js?v=ios13"></script>
+  <script src="api.js?v=ios14"></script>
+  <script src="app.js?v=ios14"></script>
 </body>
 </html>

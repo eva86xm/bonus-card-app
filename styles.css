@@ -2001,3 +2001,201 @@ body {
 .history-filter button {
   z-index: 1;
 }
+
+/* UX hardening: safe areas, fullscreen QR, filters, empty states */
+html {
+  min-height: 100%;
+  scroll-padding-top: max(24px, env(safe-area-inset-top));
+  scroll-padding-bottom: max(130px, calc(env(safe-area-inset-bottom) + 118px));
+}
+
+body {
+  min-height: 100dvh;
+}
+
+body.qr-modal-open {
+  overflow: hidden;
+}
+
+.app {
+  padding-top: max(28px, calc(env(safe-area-inset-top) + 24px));
+  padding-bottom: max(150px, calc(env(safe-area-inset-bottom) + 138px));
+}
+
+.dashboard {
+  min-height: calc(100dvh - max(56px, calc(env(safe-area-inset-top) + 48px)));
+  padding-bottom: max(170px, calc(env(safe-area-inset-bottom) + 156px));
+}
+
+.contacts-panel,
+.panel {
+  margin-bottom: max(28px, calc(env(safe-area-inset-bottom) + 22px));
+}
+
+.contacts-panel {
+  padding-bottom: max(152px, calc(env(safe-area-inset-bottom) + 138px));
+}
+
+.transactions {
+  padding-bottom: 10px;
+}
+
+.ios-tabbar {
+  bottom: max(16px, calc(env(safe-area-inset-bottom) + 12px));
+  min-height: 76px;
+}
+
+.history-header {
+  gap: 12px;
+}
+
+.transaction-type-filter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  padding: 6px;
+  border-radius: 18px;
+  background: #f4f6f9;
+}
+
+.transaction-type-filter button {
+  min-height: 42px;
+  padding: 0 10px;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: none;
+}
+
+.transaction-type-filter button.active {
+  background: #dcefe9;
+  color: var(--brand-green);
+}
+
+.empty-state {
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  min-height: 150px;
+  padding: 26px 18px;
+  border-radius: 20px;
+  background: #f6f7f9;
+  text-align: center;
+}
+
+.empty-state strong {
+  font-size: 18px;
+}
+
+.empty-state p {
+  max-width: 260px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.qr-modal {
+  z-index: 100;
+  padding:
+    max(24px, calc(env(safe-area-inset-top) + 18px))
+    18px
+    max(24px, calc(env(safe-area-inset-bottom) + 18px));
+  background:
+    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.14), transparent 34%),
+    #061c17;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.qr-modal-content {
+  width: min(100%, 430px);
+  min-height: min(620px, calc(100dvh - 52px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  padding: 22px;
+  border-radius: 34px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.qr-modal-title {
+  order: 1;
+  color: #ffffff;
+  font-size: clamp(22px, 6vw, 30px);
+  font-weight: 800;
+  line-height: 1.08;
+  text-align: center;
+}
+
+.qr-modal-box {
+  order: 2;
+  width: min(78vw, 340px);
+  height: min(78vw, 340px);
+  margin: 0 auto;
+  padding: 16px;
+  border: 0;
+  border-radius: 34px;
+  background: #ffffff;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.35);
+}
+
+.qr-modal-box img,
+.qr-modal-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.qr-modal-close {
+  order: 3;
+  width: min(100%, 340px);
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  box-shadow: none;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.qr-modal-close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.form-message:not(.hidden) {
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .app {
+    padding-top: max(92px, calc(env(safe-area-inset-top) + 72px));
+    padding-bottom: max(170px, calc(env(safe-area-inset-bottom) + 156px));
+  }
+
+  .login-screen,
+  .dashboard {
+    min-height: calc(100dvh - max(92px, calc(env(safe-area-inset-top) + 72px)));
+  }
+
+  .dashboard {
+    padding-bottom: max(184px, calc(env(safe-area-inset-bottom) + 168px));
+  }
+
+  .panel:last-of-type,
+  .contacts-panel {
+    margin-bottom: max(150px, calc(env(safe-area-inset-bottom) + 132px));
+  }
+
+  .transaction-type-filter {
+    gap: 5px;
+  }
+
+  .transaction-type-filter button {
+    min-height: 40px;
+    padding: 0 6px;
+    font-size: 13px;
+  }
+}
