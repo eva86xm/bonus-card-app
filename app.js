@@ -21,6 +21,7 @@ const backToLoginButton = document.querySelector('#backToLoginButton');
 
 const loginMessage = document.querySelector('#loginMessage');
 const loginScreen = document.querySelector('#loginScreen');
+const startupLoader = document.querySelector('#startupLoader');
 const dashboard = document.querySelector('#dashboard');
 const logoutButton = document.querySelector('#logoutButton');
 
@@ -33,7 +34,6 @@ const loyaltyProgram = document.querySelector('#loyaltyProgram');
 const cardOwner = document.querySelector('#cardOwner');
 const lastOperation = document.querySelector('#lastOperation');
 const bonusBalance = document.querySelector('#bonusBalance');
-const availableBonus = document.querySelector('#availableBonus');
 
 const qrBox = document.querySelector('#qrBox');
 const qrModal = document.querySelector('#qrModal');
@@ -47,6 +47,8 @@ let currentTransactions = [];
 let currentQrValue = '';
 
 function showDashboard(client) {
+  hideStartupLoader();
+
   currentClient = client;
 
   loginScreen.classList.add('hidden');
@@ -65,7 +67,6 @@ function showDashboard(client) {
   lastOperation.textContent = client.transactions[0]?.date || '—';
 
   bonusBalance.textContent = client.balance;
-  availableBonus.textContent = client.available;
 
   currentQrValue = client.qrValue || client.cardNumber.replace(/\s/g, '');
 
@@ -112,6 +113,8 @@ function closeQrModal() {
 }
 
 function showLogin() {
+  hideStartupLoader();
+
   currentClient = null;
   currentQrValue = '';
 
@@ -197,6 +200,34 @@ function formatPhone(value) {
 
 function showLoginMessage(message) {
   loginMessage.textContent = message;
+}
+
+function showStartupLoader() {
+  if (!startupLoader) return;
+
+  startupLoader.classList.remove('hidden');
+  loginForm.classList.add('hidden');
+
+  const authSwitch = showRegisterButton.closest('.auth-switch');
+
+  if (authSwitch) {
+    authSwitch.classList.add('hidden');
+  }
+
+  showLoginMessage('');
+}
+
+function hideStartupLoader() {
+  if (!startupLoader) return;
+
+  startupLoader.classList.add('hidden');
+  loginForm.classList.remove('hidden');
+
+  const authSwitch = showRegisterButton.closest('.auth-switch');
+
+  if (authSwitch) {
+    authSwitch.classList.remove('hidden');
+  }
 }
 
 function showPhoneStep() {
@@ -593,6 +624,11 @@ confirmRegisterButton.addEventListener('click', async function () {
 
 function showDashboardTab(target, shouldScroll = true) {
   const isContacts = target === 'contactsSection';
+  const previousTab = localStorage.getItem('activeDashboardTab') || 'mainView';
+  const direction = previousTab === 'mainView' && isContacts ? 'slide-left' : 'slide-right';
+
+  dashboard.classList.remove('slide-left', 'slide-right');
+  dashboard.classList.add(direction);
 
   dashboard.classList.toggle('show-contacts', isContacts);
 
@@ -640,14 +676,18 @@ async function restoreSession() {
   const refreshToken = localStorage.getItem('refreshToken');
 
   if (!refreshToken) {
+    hideStartupLoader();
     return;
   }
+
+  showStartupLoader();
 
   try {
     const refreshed = await backendApi.refreshSession();
 
     if (!refreshed) {
       backendApi.clearSession();
+      hideStartupLoader();
       showPhoneStep();
       return;
     }
@@ -655,6 +695,7 @@ async function restoreSession() {
     await loadSncDashboard();
   } catch {
     backendApi.clearSession();
+    hideStartupLoader();
     showPhoneStep();
   }
 }

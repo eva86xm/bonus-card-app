@@ -26,6 +26,11 @@
         </div>
       </div>
 
+      <div class="startup-loader hidden" id="startupLoader">
+        <div class="startup-spinner"></div>
+        <p>Загрузка данных карты</p>
+      </div>
+
       <form class="login-form" id="loginForm">
         <div id="phoneStep">
           <label for="phoneInput">Телефон</label>
@@ -117,6 +122,12 @@
           <p class="card-label">Бонусная карта</p>
           <h3 id="cardNumber">0000 0000 0000</h3>
           <p id="cardStatus">Активна</p>
+
+          <div class="card-balance">
+            <span>Баланс</span>
+            <strong id="bonusBalance">0</strong>
+            <small>бонусов</small>
+          </div>
         </div>
 
         <div class="qr-box" id="qrBox">QR</div>
@@ -139,28 +150,15 @@
         </div>
       </section>
 
-      <section class="balance-grid" id="balanceSection">
-        <div class="balance-item">
-          <p>Баланс</p>
-          <strong id="bonusBalance">0</strong>
-          <span>бонусов</span>
-        </div>
-
-        <div class="balance-item">
-          <p>Доступно к списанию</p>
-          <strong id="availableBonus">0</strong>
-          <span>бонусов</span>
-        </div>
-      </section>
-
       <section class="panel" id="historySection">
         <div class="panel-header history-header">
           <h3>История операций</h3>
 
-          <div class="history-filter">
-            <input id="transactionDateFilter" type="date" />
-            <button type="button" id="clearDateFilterButton">Все</button>
-          </div>
+        <div class="history-filter">
+          <span class="history-filter-label">Поиск по дате</span>
+          <input id="transactionDateFilter" type="date" />
+          <button type="button" id="clearDateFilterButton">Все</button>
+        </div>
         </div>
 
         <div class="transactions" id="transactionsList"></div>
@@ -175,7 +173,6 @@
           <div class="contacts-hero-text">
             <p class="contacts-kicker">Контакты</p>
             <h3>Иртышнефтепродукт</h3>
-            <p>Контакты АЗС Ханты-Мансийска</p>
           </div>
 
           <div class="hero-actions">
