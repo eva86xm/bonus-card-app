@@ -662,12 +662,29 @@ tabbarItems.forEach(function (item) {
 });
 
 if (transactionDateFilter) {
-  transactionDateFilter.addEventListener('change', renderFilteredTransactions);
+  transactionDateFilter.addEventListener('change', function () {
+    const filter = transactionDateFilter.closest('.history-filter');
+
+    if (filter) {
+      filter.dataset.date = transactionDateFilter.value
+        ? formatDate(transactionDateFilter.value)
+        : '';
+    }
+
+    renderFilteredTransactions();
+  });
 }
 
 if (clearDateFilterButton) {
   clearDateFilterButton.addEventListener('click', function () {
+    const filter = transactionDateFilter.closest('.history-filter');
+
     transactionDateFilter.value = '';
+
+    if (filter) {
+      filter.dataset.date = '';
+    }
+
     renderFilteredTransactions();
   });
 }

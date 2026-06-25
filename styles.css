@@ -1875,3 +1875,68 @@ body {
     height: 116px;
   }
 }
+
+/* Final fixes: contacts title and date picker */
+.contacts-hero h3 {
+  hyphens: none;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.history-filter {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.history-filter-label {
+  grid-column: 1 / -1;
+}
+
+.history-filter input[type="date"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.history-filter::after {
+  content: "Выберите дату";
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.history-filter[data-date]:not([data-date=""])::after {
+  content: attr(data-date);
+  color: var(--text);
+}
+
+.history-filter button {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 520px) {
+  .contacts-hero {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .contacts-logo-wrap {
+    width: 64px;
+    height: 64px;
+  }
+
+  .contacts-hero h3 {
+    font-size: clamp(25px, 6.4vw, 32px);
+    line-height: 1.08;
+    max-width: 100%;
+  }
+}
