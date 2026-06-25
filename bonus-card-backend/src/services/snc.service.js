@@ -295,7 +295,9 @@ async function registerCard(phone) {
   return sncRequest('/api/auth/register/card', {
     method: 'POST',
     body: JSON.stringify({
-      phone: toSncPhone(phone)
+      phone: toSncPhone(phone),
+      bonus: 1,
+      password: ''
     })
   });
 }
@@ -324,6 +326,8 @@ async function confirmRegisterCard(phone, code) {
     method: 'POST',
     body: JSON.stringify({
       phone: toSncPhone(phone),
+      bonus: 1,
+      password: '',
       code: String(code).trim()
     })
   });
