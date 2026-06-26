@@ -332,6 +332,69 @@ async function confirmRegisterCard(phone, code) {
     })
   });
 }
+
+function cloneRequisite(requisite, value) {
+  if (!requisite || typeof requisite !== 'object') {
+    return requisite;
+  }
+
+  return {
+    ...requisite,
+    requisiteValue: value
+  };
+}
+
+function prepareRegistrationRequisites(requisites, profile = {}) {
+  const prepared = {
+    ...requisites
+  };
+
+  if (prepared.cellularTelephone && profile.phone) {
+    prepared.cellularTelephone = cloneRequisite(prepared.cellularTelephone, toSncPhone(profile.phone));
+  }
+
+  if (prepared.familyPerson && profile.familyPerson) {
+    prepared.familyPerson = cloneRequisite(prepared.familyPerson, profile.familyPerson.trim());
+  }
+
+  if (prepared.namePerson && profile.namePerson) {
+    prepared.namePerson = cloneRequisite(prepared.namePerson, profile.namePerson.trim());
+  }
+
+  if (prepared.patronymicPerson && profile.patronymicPerson) {
+    prepared.patronymicPerson = cloneRequisite(prepared.patronymicPerson, profile.patronymicPerson.trim());
+  }
+
+  if (prepared.graphicalNumber && profile.graphicalNumber) {
+    prepared.graphicalNumber = cloneRequisite(prepared.graphicalNumber, String(profile.graphicalNumber).trim());
+  }
+
+  return prepared;
+}
+
+async function completeRegistration({ credentials, requisites, profile }) {
+  if (isMockMode()) {
+    return {
+      ok: true,
+      status: 200,
+      data: {
+        message: 'Регистрация завершена'
+      }
+    };
+  }
+
+  return sncRequest('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      credentials: {
+        username: String(credentials.username || '').trim(),
+        password: credentials.password || ''
+      },
+      requisites: prepareRegistrationRequisites(requisites, profile)
+    })
+  });
+}
+
 async function login(username, password) {
   if (isMockMode()) {
     if (password !== '123456') {
@@ -447,6 +510,7 @@ module.exports = {
   requestSmsPassword,
   registerCard,
   confirmRegisterCard,
+  completeRegistration,
   login,
   refreshTokens,
   logout,

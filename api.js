@@ -352,6 +352,13 @@ const backendApi = {
     });
   },
 
+  completeRegistration(payload) {
+    return this.request('/api/snc/register-complete', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
   refresh(refreshToken) {
     return this.request('/api/snc/refresh', {
       method: 'POST',

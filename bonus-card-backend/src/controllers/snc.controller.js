@@ -67,6 +67,26 @@ async function confirmRegisterCard(req, res, next) {
   }
 }
 
+async function completeRegistration(req, res, next) {
+  try {
+    const { credentials, requisites, profile } = req.body;
+
+    if (!credentials?.username || !requisites) {
+      return res.status(400).json({ error: 'Укажите данные регистрации' });
+    }
+
+    const result = await sncService.completeRegistration({
+      credentials,
+      requisites,
+      profile
+    });
+
+    sendSncResult(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function login(req, res, next) {
   try {
     const { username, password } = req.body;
@@ -190,6 +210,7 @@ module.exports = {
   requestSms,
   registerCard,
   confirmRegisterCard,
+  completeRegistration,
   login,
   refreshTokens,
   logout,

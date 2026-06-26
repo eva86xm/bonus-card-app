@@ -18,6 +18,11 @@ const registerPhoneInput = document.querySelector('#registerPhoneInput');
 const registerSmsButton = document.querySelector('#registerSmsButton');
 const registerCodeInput = document.querySelector('#registerCodeInput');
 const confirmRegisterButton = document.querySelector('#confirmRegisterButton');
+const registerDetailsStep = document.querySelector('#registerDetailsStep');
+const registerFamilyInput = document.querySelector('#registerFamilyInput');
+const registerNameInput = document.querySelector('#registerNameInput');
+const registerPatronymicInput = document.querySelector('#registerPatronymicInput');
+const completeRegisterButton = document.querySelector('#completeRegisterButton');
 const showRegisterButton = document.querySelector('#showRegisterButton');
 const backToLoginButton = document.querySelector('#backToLoginButton');
 
@@ -35,9 +40,13 @@ const cardOwner = document.querySelector('#cardOwner');
 const lastOperation = document.querySelector('#lastOperation');
 const bonusBalance = document.querySelector('#bonusBalance');
 const profileName = document.querySelector('#profileName');
+const profileInitial = document.querySelector('#profileInitial');
 const profileCardNumber = document.querySelector('#profileCardNumber');
 const profileCardStatus = document.querySelector('#profileCardStatus');
 const profileLogoutButton = document.querySelector('#profileLogoutButton');
+const profileQrButton = document.querySelector('#profileQrButton');
+const profileSessionToggle = document.querySelector('#profileSessionToggle');
+const profileNotificationsToggle = document.querySelector('#profileNotificationsToggle');
 
 const qrBox = document.querySelector('#qrBox');
 const qrModal = document.querySelector('#qrModal');
@@ -50,10 +59,11 @@ let currentClient = null;
 let currentTransactions = [];
 let currentQrValue = '';
 let currentTransactionType = 'all';
+let pendingRegistration = null;
 
 function getApiErrorMessage(result, fallbackMessage) {
   if (result && result.status === 423) {
-    return 'Профиль найден, но СНК требует заполнить обязательные данные. Нужно уточнить у СНК, какие реквизиты надо передать после регистрации.';
+    return 'Профиль найден. Заполните данные владельца, чтобы завершить регистрацию.';
   }
 
   const data = result && result.data;
@@ -75,6 +85,57 @@ function getApiErrorMessage(result, fallbackMessage) {
   }
 
   return fallbackMessage;
+}
+
+function unwrapApiData(result) {
+  return result?.data?.data ?? result?.data ?? null;
+}
+
+function parseRegistrationRequisites(result) {
+  const data = unwrapApiData(result);
+  const rawRequisites = data?.requisites?.requisiteValue || data?.requisites;
+
+  if (!rawRequisites) {
+    return null;
+  }
+
+  if (typeof rawRequisites === 'object') {
+    return rawRequisites;
+  }
+
+  try {
+    return JSON.parse(rawRequisites);
+  } catch {
+    return null;
+  }
+}
+
+function showRegistrationDetails(result, credentials, phone, graphicalNumber = '') {
+  const requisites = parseRegistrationRequisites(result);
+
+  if (!requisites) {
+    showLoginMessage('СНК просит заполнить данные, но не вернула список реквизитов. Нужно уточнить настройки регистрации у СНК.');
+    return false;
+  }
+
+  pendingRegistration = {
+    credentials,
+    requisites,
+    profile: {
+      phone,
+      graphicalNumber
+    }
+  };
+
+  phoneStep.classList.add('hidden');
+  smsStep.classList.add('hidden');
+  registerStep.classList.remove('hidden');
+  registerPhoneStep.classList.add('hidden');
+  registerCodeStep.classList.add('hidden');
+  registerDetailsStep.classList.remove('hidden');
+
+  showLoginMessage('Заполните данные владельца карты.');
+  return true;
 }
 
 function normalizeCodeInput(input) {
@@ -103,6 +164,7 @@ function showDashboard(client) {
 
   bonusBalance.textContent = client.balance;
   profileName.textContent = client.name;
+  profileInitial.textContent = getInitial(client.name);
   profileCardNumber.textContent = client.cardNumber;
   profileCardStatus.textContent = client.status;
 
@@ -176,6 +238,10 @@ function showLogin() {
 function renderTransactions(transactions) {
   currentTransactions = transactions;
   renderFilteredTransactions();
+}
+
+function getInitial(name) {
+  return String(name || 'И').trim().charAt(0).toUpperCase() || 'И';
 }
 
 function renderFilteredTransactions() {
@@ -286,6 +352,7 @@ function showPhoneStep() {
   phoneStep.classList.remove('hidden');
   smsStep.classList.add('hidden');
   registerStep.classList.add('hidden');
+  registerDetailsStep.classList.add('hidden');
   smsCodeInput.value = '';
 }
 
@@ -293,6 +360,7 @@ function showSmsStep() {
   phoneStep.classList.add('hidden');
   smsStep.classList.remove('hidden');
   registerStep.classList.add('hidden');
+  registerDetailsStep.classList.add('hidden');
   showLoginMessage('Введите код из SMS');
 }
 
@@ -303,9 +371,14 @@ function showRegisterStep() {
 
   registerPhoneStep.classList.remove('hidden');
   registerCodeStep.classList.add('hidden');
+  registerDetailsStep.classList.add('hidden');
 
   registerPhoneInput.value = '';
   registerCodeInput.value = '';
+  registerFamilyInput.value = '';
+  registerNameInput.value = '';
+  registerPatronymicInput.value = '';
+  pendingRegistration = null;
 
   const authSwitch = showRegisterButton.closest('.auth-switch');
 
@@ -320,9 +393,14 @@ function hideRegisterStep() {
   registerStep.classList.add('hidden');
   registerPhoneStep.classList.remove('hidden');
   registerCodeStep.classList.add('hidden');
+  registerDetailsStep.classList.add('hidden');
 
   registerPhoneInput.value = '';
   registerCodeInput.value = '';
+  registerFamilyInput.value = '';
+  registerNameInput.value = '';
+  registerPatronymicInput.value = '';
+  pendingRegistration = null;
 
   const authSwitch = showRegisterButton.closest('.auth-switch');
 
@@ -588,6 +666,18 @@ loginForm.addEventListener('submit', async function (event) {
     const result = await backendApi.login(sncApi.normalizePhone(phone), code);
 
     if (!result.ok) {
+      if (result.status === 423) {
+        showRegistrationDetails(
+          result,
+          {
+            username: sncApi.normalizePhone(phone),
+            password: code
+          },
+          phone
+        );
+        return;
+      }
+
       const message = getApiErrorMessage(result, 'Не удалось войти');
       showLoginMessage(message);
       return;
@@ -611,6 +701,8 @@ loginForm.addEventListener('submit', async function (event) {
 profileLogoutButton.addEventListener('click', function () {
   showLogin();
 });
+
+profileQrButton.addEventListener('click', openQrModal);
 
 qrBox.addEventListener('click', openQrModal);
 
@@ -717,9 +809,10 @@ confirmRegisterButton.addEventListener('click', async function () {
       return;
     }
 
+    const confirmData = unwrapApiData(result);
     const cardNumber =
-      result.data?.data?.cardNumber ||
-      result.data?.cardNumber ||
+      (typeof confirmData === 'string' && confirmData) ||
+      confirmData?.cardNumber ||
       'номер карты получен';
 
     showLoginMessage(`Карта зарегистрирована: ${cardNumber}. Теперь можно войти.`);
@@ -730,6 +823,69 @@ confirmRegisterButton.addEventListener('click', async function () {
   } finally {
     confirmRegisterButton.disabled = false;
     confirmRegisterButton.textContent = 'Зарегистрировать карту';
+  }
+});
+
+completeRegisterButton.addEventListener('click', async function () {
+  if (!pendingRegistration) {
+    showLoginMessage('Сначала запросите SMS и попробуйте войти.');
+    return;
+  }
+
+  const familyPerson = registerFamilyInput.value.trim();
+  const namePerson = registerNameInput.value.trim();
+  const patronymicPerson = registerPatronymicInput.value.trim();
+
+  if (!familyPerson || !namePerson) {
+    showLoginMessage('Введите фамилию и имя владельца карты.');
+    return;
+  }
+
+  completeRegisterButton.disabled = true;
+  completeRegisterButton.textContent = 'Сохраняем...';
+  showLoginMessage('Передаем данные владельца в СНК...');
+
+  try {
+    const completeResult = await backendApi.completeRegistration({
+      credentials: pendingRegistration.credentials,
+      requisites: pendingRegistration.requisites,
+      profile: {
+        ...pendingRegistration.profile,
+        familyPerson,
+        namePerson,
+        patronymicPerson
+      }
+    });
+
+    if (!completeResult.ok) {
+      const message = getApiErrorMessage(completeResult, 'Не удалось завершить регистрацию');
+      showLoginMessage(message);
+      return;
+    }
+
+    showLoginMessage('Регистрация завершена. Входим в кабинет...');
+
+    const loginResult = await backendApi.login(
+      pendingRegistration.credentials.username,
+      pendingRegistration.credentials.password
+    );
+
+    if (!loginResult.ok) {
+      const message = getApiErrorMessage(loginResult, 'Регистрация завершена. Запросите SMS и войдите еще раз.');
+      showLoginMessage(message);
+      return;
+    }
+
+    localStorage.setItem('accessToken', loginResult.data.accessToken);
+    localStorage.setItem('refreshToken', loginResult.data.refreshToken);
+    pendingRegistration = null;
+
+    await loadSncDashboard();
+  } catch {
+    showLoginMessage('Нет связи с сервером. Проверьте интернет.');
+  } finally {
+    completeRegisterButton.disabled = false;
+    completeRegisterButton.textContent = 'Завершить регистрацию';
   }
 });
 
@@ -822,7 +978,34 @@ transactionTypeButtons.forEach(function (button) {
   });
 });
 
+function initProfileSettings() {
+  const staySignedIn = localStorage.getItem('profileStaySignedIn') !== 'false';
+  const notificationsEnabled = localStorage.getItem('profileNotificationsEnabled') === 'true';
+
+  if (profileSessionToggle) {
+    profileSessionToggle.checked = staySignedIn;
+
+    profileSessionToggle.addEventListener('change', function () {
+      localStorage.setItem('profileStaySignedIn', profileSessionToggle.checked ? 'true' : 'false');
+    });
+  }
+
+  if (profileNotificationsToggle) {
+    profileNotificationsToggle.checked = notificationsEnabled;
+
+    profileNotificationsToggle.addEventListener('change', function () {
+      localStorage.setItem('profileNotificationsEnabled', profileNotificationsToggle.checked ? 'true' : 'false');
+    });
+  }
+}
+
 async function restoreSession() {
+  if (localStorage.getItem('profileStaySignedIn') === 'false') {
+    backendApi.clearSession();
+    hideStartupLoader();
+    return;
+  }
+
   const refreshToken = localStorage.getItem('refreshToken');
 
   if (!refreshToken) {
@@ -850,4 +1033,5 @@ async function restoreSession() {
   }
 }
 
+initProfileSettings();
 restoreSession();
