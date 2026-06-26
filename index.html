@@ -304,36 +304,44 @@
           <div>
             <p class="contacts-kicker">Профиль</p>
             <h3 id="profileName">Клиент</h3>
-            <p>Данные владельца карты</p>
+            <button type="button" class="profile-edit-link" id="profileEditOwnerButton">
+              Изменить данные владельца
+            </button>
           </div>
         </div>
 
-        <form class="profile-name-form" id="profileNameForm">
-          <div class="profile-form-header">
-            <strong>Изменить ФИО</strong>
-            <span>Эти данные будут отправлены в личный кабинет СНК.</span>
-          </div>
+        <section class="profile-edit-panel hidden" id="profileEditPanel">
+          <button type="button" class="profile-back-button" id="profileEditBackButton">
+            Назад в профиль
+          </button>
 
-          <div class="profile-name-grid">
-            <label>
-              <span>Фамилия</span>
-              <input id="profileFamilyInput" type="text" autocomplete="family-name" />
-            </label>
+          <form class="profile-name-form" id="profileNameForm">
+            <div class="profile-form-header">
+              <strong>Изменить ФИО</strong>
+              <span>Эти данные будут отправлены в личный кабинет СНК.</span>
+            </div>
 
-            <label>
-              <span>Имя</span>
-              <input id="profileNameInput" type="text" autocomplete="given-name" />
-            </label>
+            <div class="profile-name-grid">
+              <label>
+                <span>Фамилия</span>
+                <input id="profileFamilyInput" type="text" autocomplete="family-name" />
+              </label>
 
-            <label>
-              <span>Отчество</span>
-              <input id="profilePatronymicInput" type="text" />
-            </label>
-          </div>
+              <label>
+                <span>Имя</span>
+                <input id="profileNameInput" type="text" autocomplete="given-name" />
+              </label>
 
-          <button type="submit" id="profileNameSaveButton">Сохранить ФИО</button>
-          <p class="profile-message hidden" id="profileNameMessage"></p>
-        </form>
+              <label>
+                <span>Отчество</span>
+                <input id="profilePatronymicInput" type="text" />
+              </label>
+            </div>
+
+            <button type="submit" id="profileNameSaveButton">Сохранить ФИО</button>
+            <p class="profile-message hidden" id="profileNameMessage"></p>
+          </form>
+        </section>
 
         <div class="profile-actions">
           <button type="button" id="profileQrButton">Показать QR</button>

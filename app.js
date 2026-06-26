@@ -41,6 +41,9 @@ const lastOperation = document.querySelector('#lastOperation');
 const bonusBalance = document.querySelector('#bonusBalance');
 const profileName = document.querySelector('#profileName');
 const profileInitial = document.querySelector('#profileInitial');
+const profileEditOwnerButton = document.querySelector('#profileEditOwnerButton');
+const profileEditPanel = document.querySelector('#profileEditPanel');
+const profileEditBackButton = document.querySelector('#profileEditBackButton');
 const profileNameForm = document.querySelector('#profileNameForm');
 const profileFamilyInput = document.querySelector('#profileFamilyInput');
 const profileNameInput = document.querySelector('#profileNameInput');
@@ -267,6 +270,29 @@ function showProfileMessage(message, isError = false) {
   profileNameMessage.textContent = message;
   profileNameMessage.classList.toggle('hidden', !message);
   profileNameMessage.classList.toggle('error', isError);
+}
+
+function showProfileEditPanel() {
+  if (!profileEditPanel) {
+    return;
+  }
+
+  fillProfileNameForm(currentClient?.name || profileName.textContent);
+  showProfileMessage('');
+  profileEditPanel.classList.remove('hidden');
+  profileEditPanel.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+
+function hideProfileEditPanel() {
+  if (!profileEditPanel) {
+    return;
+  }
+
+  profileEditPanel.classList.add('hidden');
+  showProfileMessage('');
 }
 
 function renderFilteredTransactions() {
@@ -727,6 +753,14 @@ profileLogoutButton.addEventListener('click', function () {
   showLogin();
 });
 
+if (profileEditOwnerButton) {
+  profileEditOwnerButton.addEventListener('click', showProfileEditPanel);
+}
+
+if (profileEditBackButton) {
+  profileEditBackButton.addEventListener('click', hideProfileEditPanel);
+}
+
 profileQrButton.addEventListener('click', openQrModal);
 
 if (profileNameForm) {
@@ -768,6 +802,7 @@ if (profileNameForm) {
       profileName.textContent = nextName;
       profileInitial.textContent = getInitial(nextName);
       showProfileMessage('ФИО сохранено.');
+      setTimeout(hideProfileEditPanel, 700);
     } catch {
       showProfileMessage('Нет связи с сервером. Попробуйте позже.', true);
     } finally {
