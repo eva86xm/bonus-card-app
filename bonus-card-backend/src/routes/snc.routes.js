@@ -12,6 +12,7 @@ router.post('/login', sncController.login);
 router.post('/refresh', sncController.refreshTokens);
 router.post('/logout', sncController.logout);
 router.get('/user', sncController.getUser);
+router.put('/profile/name', sncController.updateProfileName);
 router.get('/owner', sncController.getOwner);
 router.get('/transactions', sncController.getTransactions);
 router.get('/qr-code', sncController.getQrCode);

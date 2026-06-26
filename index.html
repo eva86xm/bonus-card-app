@@ -124,7 +124,7 @@
           </button>
         </div>
 
-        <p class="form-message" id="loginMessage"></p>
+        <p class="form-message hidden" id="loginMessage"></p>
       </form>
 
       <p class="auth-switch" id="authSwitch">
@@ -304,24 +304,39 @@
           <div>
             <p class="contacts-kicker">Профиль</p>
             <h3 id="profileName">Клиент</h3>
-            <p>Настройки личного кабинета</p>
+            <p>Данные владельца карты</p>
           </div>
         </div>
 
-        <div class="profile-summary">
-          <div>
-            <span>Карта</span>
-            <strong id="profileCardNumber">0000 0000 0000</strong>
+        <form class="profile-name-form" id="profileNameForm">
+          <div class="profile-form-header">
+            <strong>Изменить ФИО</strong>
+            <span>Эти данные будут отправлены в личный кабинет СНК.</span>
           </div>
-          <div>
-            <span>Статус</span>
-            <strong id="profileCardStatus">Активна</strong>
+
+          <div class="profile-name-grid">
+            <label>
+              <span>Фамилия</span>
+              <input id="profileFamilyInput" type="text" autocomplete="family-name" />
+            </label>
+
+            <label>
+              <span>Имя</span>
+              <input id="profileNameInput" type="text" autocomplete="given-name" />
+            </label>
+
+            <label>
+              <span>Отчество</span>
+              <input id="profilePatronymicInput" type="text" />
+            </label>
           </div>
-        </div>
+
+          <button type="submit" id="profileNameSaveButton">Сохранить ФИО</button>
+          <p class="profile-message hidden" id="profileNameMessage"></p>
+        </form>
 
         <div class="profile-actions">
           <button type="button" id="profileQrButton">Показать QR</button>
-          <a href="tel:+73467327714">Позвонить</a>
         </div>
 
         <div class="profile-list compact-list">

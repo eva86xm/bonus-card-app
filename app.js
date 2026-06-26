@@ -41,8 +41,12 @@ const lastOperation = document.querySelector('#lastOperation');
 const bonusBalance = document.querySelector('#bonusBalance');
 const profileName = document.querySelector('#profileName');
 const profileInitial = document.querySelector('#profileInitial');
-const profileCardNumber = document.querySelector('#profileCardNumber');
-const profileCardStatus = document.querySelector('#profileCardStatus');
+const profileNameForm = document.querySelector('#profileNameForm');
+const profileFamilyInput = document.querySelector('#profileFamilyInput');
+const profileNameInput = document.querySelector('#profileNameInput');
+const profilePatronymicInput = document.querySelector('#profilePatronymicInput');
+const profileNameSaveButton = document.querySelector('#profileNameSaveButton');
+const profileNameMessage = document.querySelector('#profileNameMessage');
 const profileLogoutButton = document.querySelector('#profileLogoutButton');
 const profileQrButton = document.querySelector('#profileQrButton');
 const profileSessionToggle = document.querySelector('#profileSessionToggle');
@@ -165,8 +169,7 @@ function showDashboard(client) {
   bonusBalance.textContent = client.balance;
   profileName.textContent = client.name;
   profileInitial.textContent = getInitial(client.name);
-  profileCardNumber.textContent = client.cardNumber;
-  profileCardStatus.textContent = client.status;
+  fillProfileNameForm(client.name);
 
   currentQrValue = client.qrValue || client.cardNumber.replace(/\s/g, '');
 
@@ -242,6 +245,28 @@ function renderTransactions(transactions) {
 
 function getInitial(name) {
   return String(name || 'И').trim().charAt(0).toUpperCase() || 'И';
+}
+
+function fillProfileNameForm(fullName) {
+  if (!profileFamilyInput || !profileNameInput || !profilePatronymicInput) {
+    return;
+  }
+
+  const parts = String(fullName || '').trim().split(/\s+/).filter(Boolean);
+
+  profileFamilyInput.value = parts[0] || '';
+  profileNameInput.value = parts[1] || parts[0] || '';
+  profilePatronymicInput.value = parts.slice(2).join(' ');
+}
+
+function showProfileMessage(message, isError = false) {
+  if (!profileNameMessage) {
+    return;
+  }
+
+  profileNameMessage.textContent = message;
+  profileNameMessage.classList.toggle('hidden', !message);
+  profileNameMessage.classList.toggle('error', isError);
 }
 
 function renderFilteredTransactions() {
@@ -703,6 +728,54 @@ profileLogoutButton.addEventListener('click', function () {
 });
 
 profileQrButton.addEventListener('click', openQrModal);
+
+if (profileNameForm) {
+  profileNameForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const familyPerson = profileFamilyInput.value.trim();
+    const namePerson = profileNameInput.value.trim();
+    const patronymicPerson = profilePatronymicInput.value.trim();
+
+    if (!familyPerson || !namePerson) {
+      showProfileMessage('Введите фамилию и имя.', true);
+      return;
+    }
+
+    profileNameSaveButton.disabled = true;
+    profileNameSaveButton.textContent = 'Сохраняем...';
+    showProfileMessage('Сохраняем данные...');
+
+    try {
+      const result = await backendApi.updateProfileName({
+        familyPerson,
+        namePerson,
+        patronymicPerson
+      });
+
+      if (!result.ok) {
+        showProfileMessage(getApiErrorMessage(result, 'Не удалось сохранить ФИО'), true);
+        return;
+      }
+
+      const nextName = [familyPerson, namePerson, patronymicPerson]
+        .filter(Boolean)
+        .join(' ');
+
+      currentClient.name = nextName;
+      clientName.textContent = nextName;
+      cardOwner.textContent = nextName;
+      profileName.textContent = nextName;
+      profileInitial.textContent = getInitial(nextName);
+      showProfileMessage('ФИО сохранено.');
+    } catch {
+      showProfileMessage('Нет связи с сервером. Попробуйте позже.', true);
+    } finally {
+      profileNameSaveButton.disabled = false;
+      profileNameSaveButton.textContent = 'Сохранить ФИО';
+    }
+  });
+}
 
 qrBox.addEventListener('click', openQrModal);
 

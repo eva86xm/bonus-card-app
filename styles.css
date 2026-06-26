@@ -1961,9 +1961,6 @@ body.qr-modal-open {
   background: rgba(255, 255, 255, 0.22);
 }
 
-.form-message:not(.hidden) {
-  display: block;
-}
 
 @media (max-width: 520px) {
   .app {
@@ -2818,22 +2815,99 @@ a:active,
   white-space: nowrap;
 }
 
-.profile-summary {
+.profile-name-form {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.profile-summary div {
-  min-width: 0;
-  padding: 18px;
+  gap: 14px;
+  padding: 20px;
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 24px;
   background: #ffffff;
   box-shadow: var(--shadow-soft);
 }
 
-.profile-summary span,
+.profile-form-header {
+  display: grid;
+  gap: 4px;
+}
+
+.profile-form-header strong {
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 850;
+}
+
+.profile-form-header span,
+.profile-name-grid label span {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.profile-name-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.profile-name-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+.profile-name-grid input {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 0 14px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.profile-name-grid input:focus {
+  border-color: rgba(15, 107, 87, 0.42);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(15, 107, 87, 0.1);
+}
+
+.profile-name-form button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 17px;
+  background: var(--brand-green);
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.profile-name-form button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.profile-message {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--brand-green-soft);
+  color: var(--brand-green);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.profile-message.error {
+  background: #fff1f0;
+  color: var(--red);
+}
+
 .profile-setting small,
 .profile-link small {
   display: block;
@@ -2842,25 +2916,13 @@ a:active,
   line-height: 1.25;
 }
 
-.profile-summary strong {
-  display: block;
-  margin-top: 6px;
-  overflow: hidden;
-  color: var(--text);
-  font-size: 17px;
-  line-height: 1.25;
-  font-weight: 850;
-  text-overflow: ellipsis;
-}
-
 .profile-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 10px;
 }
 
-.profile-actions button,
-.profile-actions a {
+.profile-actions button {
   min-height: 52px;
   display: grid;
   place-items: center;
@@ -2872,12 +2934,6 @@ a:active,
   font-weight: 850;
   text-decoration: none;
   box-shadow: 0 14px 30px rgba(15, 107, 87, 0.16);
-}
-
-.profile-actions a {
-  background: var(--brand-green-soft);
-  color: var(--brand-green);
-  box-shadow: none;
 }
 
 .profile-setting,
@@ -2954,10 +3010,7 @@ a:active,
     border-radius: 24px;
   }
 
-  .profile-summary {
-    grid-template-columns: 1fr;
-  }
-
+  .profile-name-grid,
   .profile-actions {
     grid-template-columns: 1fr;
   }
@@ -2968,3 +3021,4 @@ a:active,
     padding: 15px 16px;
   }
 }
+

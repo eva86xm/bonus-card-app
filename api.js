@@ -359,6 +359,16 @@ const backendApi = {
     });
   },
 
+  updateProfileName(fullname) {
+    return this.request('/api/snc/profile/name', {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      },
+      body: JSON.stringify(fullname)
+    });
+  },
+
   refresh(refreshToken) {
     return this.request('/api/snc/refresh', {
       method: 'POST',

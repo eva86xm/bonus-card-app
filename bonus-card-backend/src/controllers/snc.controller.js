@@ -157,6 +157,31 @@ async function getUser(req, res, next) {
   }
 }
 
+async function updateProfileName(req, res, next) {
+  try {
+    const accessToken = getAccessToken(req);
+    const { familyPerson, namePerson, patronymicPerson = '' } = req.body;
+
+    if (!accessToken) {
+      return res.status(401).json({ error: 'Нет accessToken' });
+    }
+
+    if (!familyPerson || !namePerson) {
+      return res.status(400).json({ error: 'Укажите фамилию и имя' });
+    }
+
+    const result = await sncService.updateProfileName(accessToken, {
+      familyPerson,
+      namePerson,
+      patronymicPerson
+    });
+
+    sendSncResult(res, result);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function getOwner(req, res, next) {
   try {
     const accessToken = getAccessToken(req);
@@ -215,6 +240,7 @@ module.exports = {
   refreshTokens,
   logout,
   getUser,
+  updateProfileName,
   getOwner,
   getTransactions,
   getQrCode

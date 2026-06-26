@@ -471,6 +471,31 @@ async function getOwner(accessToken) {
   });
 }
 
+async function updateProfileName(accessToken, fullname) {
+  if (isMockMode()) {
+    mockUser.name = `${fullname.familyPerson} ${fullname.namePerson}`.trim();
+    mockOwner.name = mockUser.name;
+
+    return {
+      ok: true,
+      status: 200,
+      data: {
+        message: 'ФИО обновлено'
+      }
+    };
+  }
+
+  return sncRequest('/api/profile/name', {
+    method: 'PUT',
+    headers: withAccessToken(accessToken),
+    body: JSON.stringify({
+      familyPerson: String(fullname.familyPerson || '').trim(),
+      namePerson: String(fullname.namePerson || '').trim(),
+      patronymicPerson: String(fullname.patronymicPerson || '').trim()
+    })
+  });
+}
+
 async function getTransactions(accessToken) {
   if (isMockMode()) {
     return {
@@ -515,6 +540,7 @@ module.exports = {
   refreshTokens,
   logout,
   getUser,
+  updateProfileName,
   getOwner,
   getTransactions,
   getQrCode
