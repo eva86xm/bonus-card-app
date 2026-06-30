@@ -224,7 +224,11 @@ async function getQrCode(req, res, next) {
 
     const result = await sncService.getQrCode(accessToken);
 
-    sendSncResult(res, result);
+    if (result.status === 412) {
+      return res.status(200).json(result);
+    }
+
+    return sendSncResult(res, result);
   } catch (error) {
     next(error);
   }

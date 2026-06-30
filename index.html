@@ -8,7 +8,7 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
-  <link rel="stylesheet" href="styles.css?v=ios19" />
+  <link rel="stylesheet" href="styles.css?v=ios26" />
 
   <meta name="apple-mobile-web-app-title" content="ИНП" />
   <meta name="application-name" content="ИНП" />
@@ -181,6 +181,21 @@
       <section class="panel" id="historySection">
         <div class="panel-header history-header">
           <h3>История операций</h3>
+          <button type="button" class="history-all-button" id="openHistoryButton">
+            Все
+          </button>
+        </div>
+
+        <div class="transactions" id="transactionsList"></div>
+      </section>
+
+      <section class="history-details-panel" id="historyDetailsSection">
+        <header class="subpage-header">
+          <button type="button" class="subpage-back-button" id="historyBackButton" aria-label="Вернуться к карте">
+            Назад
+          </button>
+          <h3>История операций</h3>
+        </header>
 
         <div class="transaction-type-filter" id="transactionTypeFilter">
           <button type="button" class="active" data-type="all" aria-label="Показать все операции">Все</button>
@@ -190,13 +205,12 @@
 
         <div class="history-filter">
           <div class="date-picker-control" id="datePickerControl">
-            <span id="dateFilterText">📅 Выбрать период</span>
+            <span id="dateFilterText">Выбрать период</span>
             <input id="transactionDateFilter" type="date" aria-label="Выбрать дату операции" />
           </div>
         </div>
-        </div>
 
-        <div class="transactions" id="transactionsList"></div>
+        <div class="transactions history-details-list" id="allTransactionsList"></div>
       </section>
 
       <section class="contacts-panel" id="contactsSection">
@@ -304,9 +318,6 @@
           <div>
             <p class="contacts-kicker">Профиль</p>
             <h3 id="profileName">Клиент</h3>
-            <button type="button" class="profile-edit-link" id="profileEditOwnerButton">
-              Изменить данные владельца
-            </button>
           </div>
         </div>
 
@@ -371,6 +382,10 @@
             </span>
           </a>
 
+          <button type="button" class="profile-edit-row" id="profileEditOwnerButton">
+            Изменить данные владельца
+          </button>
+
           <button type="button" class="profile-logout" id="profileLogoutButton">Выйти из кабинета</button>
         </div>
       </section>
@@ -421,7 +436,7 @@
   </main>
 
   <script src="qrcode.min.js"></script>
-  <script src="api.js?v=ios19"></script>
-  <script src="app.js?v=ios19"></script>
+  <script src="api.js?v=ios26"></script>
+  <script src="app.js?v=ios26"></script>
 </body>
 </html>

@@ -2815,6 +2815,122 @@ a:active,
   white-space: nowrap;
 }
 
+/* Dedicated history and owner-edit screens */
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.history-all-button,
+.subpage-back-button {
+  min-width: 64px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 15px;
+  padding: 0 16px;
+  background: var(--brand-green-soft);
+  color: var(--brand-green);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.history-all-button:active,
+.subpage-back-button:active {
+  transform: scale(0.98);
+}
+
+#historySection .transactions {
+  max-height: none;
+  overflow: visible;
+}
+
+.history-details-panel {
+  display: none;
+  width: 100%;
+  gap: 14px;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.history-details-panel > * {
+  order: 0;
+}
+
+.subpage-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.subpage-header h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.history-details-list {
+  max-height: min(58vh, 620px);
+}
+
+.dashboard.show-history-details #cardSection,
+.dashboard.show-history-details .card-info,
+.dashboard.show-history-details #historySection,
+.dashboard.show-history-details #contactsSection,
+.dashboard.show-history-details #profileSection {
+  display: none;
+}
+
+.dashboard.show-history-details #historyDetailsSection {
+  display: grid;
+  animation: softOpen 0.22s ease-out;
+}
+
+.dashboard.show-profile-edit #profileSection > .profile-card,
+.dashboard.show-profile-edit #profileSection > .profile-actions,
+.dashboard.show-profile-edit #profileSection > .profile-list {
+  display: none;
+}
+
+.dashboard.show-profile-edit #profileEditPanel {
+  display: grid;
+  min-height: min(62vh, 620px);
+  align-content: start;
+  animation: softOpen 0.22s ease-out;
+}
+
+@media (max-width: 520px) {
+  .history-details-panel {
+    gap: 12px;
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .subpage-header {
+    gap: 10px;
+  }
+
+  .subpage-header h3 {
+    font-size: 20px;
+  }
+
+  .history-details-list {
+    max-height: calc(100dvh - 330px);
+  }
+
+  .dashboard.show-profile-edit #profileEditPanel {
+    min-height: calc(100dvh - 230px);
+  }
+}
+
 .profile-edit-link {
   display: inline-flex;
   width: fit-content;
@@ -2979,7 +3095,8 @@ a:active,
 }
 
 .profile-setting,
-.profile-link {
+.profile-link,
+.profile-edit-row {
   min-height: 72px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -2992,6 +3109,7 @@ a:active,
 
 .profile-setting + .profile-setting,
 .profile-link,
+.profile-edit-row,
 .profile-logout {
   border-top: 1px solid rgba(17, 24, 39, 0.06);
 }
@@ -3003,6 +3121,99 @@ a:active,
   color: var(--text);
   font-size: 16px;
   line-height: 1.2;
+}
+
+.profile-edit-row {
+  width: 100%;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  padding: 0 18px;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  background: #ffffff;
+  color: var(--brand-green);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 850;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.profile-edit-row:active {
+  background: var(--surface-muted);
+}
+
+.profile-edit-row,
+.profile-logout {
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* Directional tab transitions */
+.dashboard.slide-left:not(.show-contacts):not(.show-profile) #cardSection,
+.dashboard.slide-left:not(.show-contacts):not(.show-profile) .card-info,
+.dashboard.slide-left:not(.show-contacts):not(.show-profile) #historySection,
+.dashboard.slide-left.show-contacts #contactsSection,
+.dashboard.slide-left.show-profile #profileSection {
+  animation: tabFromRight 0.3s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+
+.dashboard.slide-right:not(.show-contacts):not(.show-profile) #cardSection,
+.dashboard.slide-right:not(.show-contacts):not(.show-profile) .card-info,
+.dashboard.slide-right:not(.show-contacts):not(.show-profile) #historySection,
+.dashboard.slide-right.show-contacts #contactsSection,
+.dashboard.slide-right.show-profile #profileSection {
+  animation: tabFromLeft 0.3s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+}
+
+@keyframes tabFromRight {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translate3d(32px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tabFromLeft {
+  from {
+    opacity: 0;
+    filter: blur(7px);
+    transform: translate3d(-32px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard.slide-left #cardSection,
+  .dashboard.slide-left .card-info,
+  .dashboard.slide-left #historySection,
+  .dashboard.slide-left #contactsSection,
+  .dashboard.slide-left #profileSection,
+  .dashboard.slide-right #cardSection,
+  .dashboard.slide-right .card-info,
+  .dashboard.slide-right #historySection,
+  .dashboard.slide-right #contactsSection,
+  .dashboard.slide-right #profileSection {
+    animation: none;
+  }
 }
 
 .profile-setting input {
@@ -3050,6 +3261,18 @@ a:active,
     grid-template-columns: 58px minmax(0, 1fr);
     padding: 20px;
     border-radius: 24px;
+  }
+
+  .profile-card h3 {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: clamp(22px, 7vw, 30px);
+    line-height: 1.08;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .profile-name-grid,

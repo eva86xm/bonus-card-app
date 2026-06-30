@@ -10,6 +10,8 @@ const smsStep = document.querySelector('#smsStep');
 const transactionDateFilter = document.querySelector('#transactionDateFilter');
 const dateFilterText = document.querySelector('#dateFilterText');
 const transactionTypeButtons = document.querySelectorAll('#transactionTypeFilter button');
+const openHistoryButton = document.querySelector('#openHistoryButton');
+const historyBackButton = document.querySelector('#historyBackButton');
 
 const registerStep = document.querySelector('#registerStep');
 const registerPhoneStep = document.querySelector('#registerPhoneStep');
@@ -61,6 +63,7 @@ const qrModalBox = document.querySelector('#qrModalBox');
 const qrModalClose = document.querySelector('#qrModalClose');
 
 const transactionsList = document.querySelector('#transactionsList');
+const allTransactionsList = document.querySelector('#allTransactionsList');
 
 let currentClient = null;
 let currentTransactions = [];
@@ -243,6 +246,7 @@ function showLogin() {
 
 function renderTransactions(transactions) {
   currentTransactions = transactions;
+  renderTransactionsPreview();
   renderFilteredTransactions();
 }
 
@@ -280,10 +284,8 @@ function showProfileEditPanel() {
   fillProfileNameForm(currentClient?.name || profileName.textContent);
   showProfileMessage('');
   profileEditPanel.classList.remove('hidden');
-  profileEditPanel.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start'
-  });
+  dashboard.classList.add('show-profile-edit');
+  window.scrollTo(0, 0);
 }
 
 function hideProfileEditPanel() {
@@ -292,12 +294,11 @@ function hideProfileEditPanel() {
   }
 
   profileEditPanel.classList.add('hidden');
+  dashboard.classList.remove('show-profile-edit');
   showProfileMessage('');
 }
 
 function renderFilteredTransactions() {
-  transactionsList.innerHTML = '';
-
   let transactions = currentTransactions;
 
   if (transactionDateFilter && transactionDateFilter.value) {
@@ -312,8 +313,18 @@ function renderFilteredTransactions() {
     });
   }
 
+  renderTransactionItems(allTransactionsList, transactions);
+}
+
+function renderTransactionItems(container, transactions) {
+  if (!container) {
+    return;
+  }
+
+  container.innerHTML = '';
+
   if (!transactions.length) {
-    transactionsList.innerHTML = `
+    container.innerHTML = `
       <div class="empty-state">
         <strong>Пока нет операций</strong>
         <p>После первой покупки здесь появится история.</p>
@@ -334,8 +345,23 @@ function renderFilteredTransactions() {
       <span class="${transaction.type}">${transaction.amount}</span>
     `;
 
-    transactionsList.appendChild(item);
+    container.appendChild(item);
   });
+}
+
+function renderTransactionsPreview() {
+  renderTransactionItems(transactionsList, currentTransactions.slice(0, 3));
+}
+
+function showHistoryDetails() {
+  dashboard.classList.add('show-history-details');
+  renderFilteredTransactions();
+  window.scrollTo(0, 0);
+}
+
+function hideHistoryDetails() {
+  dashboard.classList.remove('show-history-details');
+  window.scrollTo(0, 0);
 }
 
 function formatPhone(value) {
@@ -579,7 +605,8 @@ function formatFriendlyDate(value) {
 
   return date.toLocaleDateString('ru-RU', {
     day: 'numeric',
-    month: 'long'
+    month: 'long',
+    year: 'numeric'
   });
 }
 
@@ -1001,15 +1028,29 @@ function showDashboardTab(target, shouldScroll = true) {
   const isContacts = target === 'contactsSection';
   const isProfile = target === 'profileSection';
   const previousTab = localStorage.getItem('activeDashboardTab') || 'mainView';
+  const tabOrder = ['mainView', 'contactsSection', 'profileSection'];
 
   if (target === previousTab && shouldScroll) {
     return;
   }
 
-  const direction = previousTab === 'mainView' && isContacts ? 'slide-left' : 'slide-right';
+  const previousIndex = tabOrder.indexOf(previousTab);
+  const targetIndex = tabOrder.indexOf(target);
+  const direction = shouldScroll && previousIndex !== targetIndex
+    ? (targetIndex > previousIndex ? 'slide-left' : 'slide-right')
+    : '';
 
   dashboard.classList.remove('slide-left', 'slide-right');
-  dashboard.classList.add(direction);
+
+  if (direction) {
+    void dashboard.offsetWidth;
+    dashboard.classList.add(direction);
+  }
+  dashboard.classList.remove('show-history-details', 'show-profile-edit');
+
+  if (profileEditPanel) {
+    profileEditPanel.classList.add('hidden');
+  }
 
   dashboard.classList.toggle('show-contacts', isContacts);
   dashboard.classList.toggle('show-profile', isProfile);
@@ -1047,6 +1088,14 @@ tabbarItems.forEach(function (item) {
   });
 });
 
+if (openHistoryButton) {
+  openHistoryButton.addEventListener('click', showHistoryDetails);
+}
+
+if (historyBackButton) {
+  historyBackButton.addEventListener('click', hideHistoryDetails);
+}
+
 if (transactionDateFilter) {
   const filter = transactionDateFilter.closest('.history-filter');
 
@@ -1054,7 +1103,7 @@ if (transactionDateFilter) {
     if (dateFilterText) {
       dateFilterText.textContent = transactionDateFilter.value
         ? formatDate(transactionDateFilter.value)
-        : '📅 Выбрать период';
+        : 'Выбрать период';
     }
 
     renderFilteredTransactions();
