@@ -15,9 +15,16 @@
   --radius-button: 16px;
   --radius-card: 24px;
   --radius-panel: 28px;
+  --radius-control: 16px;
+  --motion-fast: 0.18s ease;
+  --surface: #ffffff;
+  --surface-soft: #f8faf9;
+  --surface-muted: #f2f7f5;
+  --surface-border: rgba(8, 72, 60, 0.08);
 
-  --shadow-soft: 0 8px 24px rgba(17, 24, 39, 0.05);
-  --shadow-card: 0 14px 34px rgba(17, 24, 39, 0.07);
+  --shadow-soft: 0 10px 28px rgba(17, 24, 39, 0.07);
+  --shadow-card: 0 18px 46px rgba(17, 24, 39, 0.09);
+  --shadow-raised: 0 22px 54px rgba(17, 24, 39, 0.11);
 }
 
 * {
@@ -396,6 +403,8 @@ p {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
+  min-height: 128px;
+  padding: 0;
   border: 8px solid #ffffff;
   border-radius: 22px;
   background: #ffffff;
@@ -2088,18 +2097,11 @@ input:focus-visible,
 }
 
 /* iOS polish: compact history filters, QR hint, unified motion */
-:root {
-  --radius-control: 16px;
-  --radius-card: 22px;
-  --motion-fast: 0.18s ease;
-}
-
 button,
 a,
 .qr-box,
 .transaction-item,
 .contact-row,
-.azs-card,
 .ios-tabbar-item,
 .date-picker-control {
   transition:
@@ -2115,7 +2117,6 @@ a:active,
 .qr-box:active,
 .transaction-item:active,
 .contact-row:active,
-.azs-card:active,
 .ios-tabbar-item:active,
 .date-picker-control:active {
   transform: scale(0.98);
@@ -2247,7 +2248,6 @@ a:active,
 .contacts-group,
 .azs-map,
 .contact-row,
-.azs-card,
 .card-info div,
 .panel {
   border-radius: var(--radius-card);
@@ -2433,27 +2433,6 @@ a:active,
   border-radius: 22px;
   background: #ffffff;
   box-shadow: var(--shadow-soft);
-}
-
-.profile-row {
-  display: grid;
-  gap: 5px;
-  padding: 18px;
-}
-
-.profile-row + .profile-row {
-  border-top: 1px solid rgba(17, 24, 39, 0.06);
-}
-
-.profile-row span {
-  color: var(--muted);
-  font-size: 15px;
-}
-
-.profile-row strong {
-  color: var(--text);
-  font-size: 18px;
-  line-height: 1.2;
 }
 
 .profile-logout {
@@ -2931,27 +2910,217 @@ a:active,
   }
 }
 
-.profile-edit-link {
-  display: inline-flex;
-  width: fit-content;
-  min-height: 34px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
+/* Contact, history and navigation finishing touches */
+.azs-map .nearest-station-button {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 6;
+  width: auto;
+  min-height: 50px;
   border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 999px;
-  padding: 0 14px;
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform 0.18s ease, background 0.18s ease;
+  background: rgba(15, 107, 87, 0.94);
+  box-shadow: 0 14px 34px rgba(8, 72, 60, 0.28);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
-.profile-edit-link:active {
-  transform: scale(0.98);
+.contact-row::after {
+  content: "☎︎";
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.contact-row.mail::after {
+  content: "@";
+  font-size: 18px;
+}
+
+.subpage-back-button,
+.profile-back-button {
+  width: fit-content;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--brand-green);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: none;
+}
+
+.transaction-type-filter button {
+  min-height: 44px;
+}
+
+/* Layered light surfaces */
+body {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(15, 107, 87, 0.055), transparent 28rem),
+    linear-gradient(180deg, #f8faf9 0%, #f3f6f5 55%, #f2f7f5 100%);
+}
+
+.login-form,
+.startup-loader,
+.card-info,
+.panel,
+.contacts-hero,
+.compact-list,
+.azs-map,
+.profile-list,
+.profile-name-form,
+.history-details-panel {
+  border-color: var(--surface-border);
+  background: linear-gradient(145deg, var(--surface) 0%, var(--surface-soft) 100%);
+  box-shadow: var(--shadow-card);
+}
+
+.login-form,
+.startup-loader {
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow-raised);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.card-info div,
+.profile-setting,
+.profile-link,
+.profile-edit-row {
+  background: transparent;
+}
+
+.transaction-item,
+.transaction-type-filter,
+.history-filter,
+.azs-row {
+  border-color: var(--surface-border);
+  background: linear-gradient(145deg, var(--surface-soft), var(--surface-muted));
+}
+
+.transaction-item {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    0 5px 15px rgba(17, 24, 39, 0.045);
+}
+
+.contacts-hero,
+.profile-name-form,
+.history-details-panel {
+  box-shadow: var(--shadow-raised);
+}
+
+.contact-row:hover,
+.azs-row:hover,
+.profile-edit-row:active {
+  background: var(--surface-muted);
+}
+
+.hero-actions a:not(:first-child),
+.transaction-type-filter button.active,
+.ios-tabbar-item.active {
+  background: linear-gradient(145deg, #edf7f3, #dfeee9);
+}
+
+.ios-tabbar {
+  border-color: rgba(8, 72, 60, 0.1);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow:
+    0 20px 48px rgba(17, 24, 39, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.bonus-card,
+.profile-card {
+  box-shadow:
+    0 22px 48px rgba(8, 72, 60, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.qr-box,
+.contacts-logo-wrap {
+  box-shadow: 0 14px 32px rgba(8, 72, 60, 0.2);
+}
+
+@media (max-width: 520px) {
+  body {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(15, 107, 87, 0.045), transparent 22rem),
+      linear-gradient(180deg, #f8faf9, #f2f7f5);
+  }
+
+  .card-info,
+  .panel,
+  .contacts-hero,
+  .compact-list,
+  .profile-list,
+  .profile-name-form,
+  .history-details-panel {
+    box-shadow: 0 12px 32px rgba(17, 24, 39, 0.075);
+  }
+}
+
+.ios-tabbar-item {
+  opacity: 0.6;
+}
+
+.ios-tabbar-item.active {
+  color: var(--brand-green-dark);
+  font-weight: 850;
+  opacity: 1;
+}
+
+.ios-tabbar-item.active .tab-icon {
+  color: var(--brand-green-dark);
+  opacity: 1;
+}
+
+.history-details-list {
+  gap: 16px;
+  padding: 2px;
+}
+
+.history-details-list .transaction-item {
+  min-height: 68px;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.07);
+}
+
+.history-details-panel {
+  position: relative;
+  margin-top: 52px;
+  overflow: visible;
+}
+
+.history-details-panel .subpage-header {
+  display: block;
+}
+
+.history-details-panel .subpage-back-button {
+  position: absolute;
+  top: -52px;
+  left: 2px;
+}
+
+@media (max-width: 520px) {
+  .azs-map .nearest-station-button {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    min-height: 48px;
+  }
+
+  .history-details-list {
+    gap: 16px;
+  }
 }
 
 .profile-edit-panel {
@@ -3285,5 +3454,21 @@ a:active,
     min-height: 68px;
     padding: 15px 16px;
   }
+}
+
+.profile-back-button {
+  width: fit-content;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--brand-green);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: none;
 }
 

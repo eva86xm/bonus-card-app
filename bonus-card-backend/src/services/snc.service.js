@@ -151,6 +151,7 @@ function toCardResponse(client) {
 async function sncRequest(path, options = {}) {
   const baseUrl = process.env.SNC_API_URL;
   const apiKey = process.env.SNC_API_KEY;
+  const timeout = Number(process.env.SNC_API_TIMEOUT_MS) || 15000;
 
   if (!baseUrl || !apiKey) {
     throw new Error('SNC_API_URL или SNC_API_KEY не настроены');
@@ -166,6 +167,9 @@ async function sncRequest(path, options = {}) {
         'Content-Type': 'application/json',
         ...(options.headers || {})
       },
+      timeout,
+      maxContentLength: 2 * 1024 * 1024,
+      maxBodyLength: 2 * 1024 * 1024,
       validateStatus: () => true
     });
 
@@ -178,7 +182,9 @@ async function sncRequest(path, options = {}) {
     return {
       ok: false,
       status: 0,
-      data: error.message
+      data: error.code === 'ECONNABORTED'
+        ? 'Сервис СНК не ответил вовремя'
+        : 'Не удалось связаться с сервисом СНК'
     };
   }
 }
@@ -194,7 +200,7 @@ function toSncPhone(phone) {
 }
 
 function isMockMode() {
-  return process.env.MOCK_MODE === 'true';
+  return process.env.NODE_ENV !== 'production' && process.env.MOCK_MODE === 'true';
 }
 
 const mockTokens = {

@@ -126,7 +126,15 @@ const sncApi = {
 const savedClients = localStorage.getItem('sncClients');
 
 if (savedClients) {
-  sncApi.clients = JSON.parse(savedClients);
+  try {
+    const parsedClients = JSON.parse(savedClients);
+
+    if (Array.isArray(parsedClients)) {
+      sncApi.clients = parsedClients;
+    }
+  } catch {
+    localStorage.removeItem('sncClients');
+  }
 }
 
 sncApi.saveClients = function () {
@@ -366,13 +374,6 @@ const backendApi = {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       },
       body: JSON.stringify(fullname)
-    });
-  },
-
-  refresh(refreshToken) {
-    return this.request('/api/snc/refresh', {
-      method: 'POST',
-      body: JSON.stringify({ refreshToken })
     });
   },
 

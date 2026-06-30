@@ -8,7 +8,7 @@
 
   <link rel="icon" href="logo.png" />
   <link rel="apple-touch-icon" href="logo.png" />
-  <link rel="stylesheet" href="styles.css?v=ios26" />
+  <link rel="stylesheet" href="styles.css?v=ios31" />
 
   <meta name="apple-mobile-web-app-title" content="ИНП" />
   <meta name="application-name" content="ИНП" />
@@ -124,7 +124,7 @@
           </button>
         </div>
 
-        <p class="form-message hidden" id="loginMessage"></p>
+        <p class="form-message hidden" id="loginMessage" role="status" aria-live="polite"></p>
       </form>
 
       <p class="auth-switch" id="authSwitch">
@@ -158,7 +158,7 @@
           </div>
         </div>
 
-        <div class="qr-box" id="qrBox" role="button" tabindex="0" aria-label="Открыть QR-код на весь экран">QR</div>
+        <button type="button" class="qr-box" id="qrBox" aria-label="Открыть QR-код на весь экран">QR</button>
       </section>
 
       <section class="card-info">
@@ -192,7 +192,7 @@
       <section class="history-details-panel" id="historyDetailsSection">
         <header class="subpage-header">
           <button type="button" class="subpage-back-button" id="historyBackButton" aria-label="Вернуться к карте">
-            Назад
+            ← Назад
           </button>
           <h3>История операций</h3>
         </header>
@@ -264,15 +264,6 @@
             <p>3 адреса в Ханты-Мансийске</p>
           </div>
 
-          <a
-            class="nearest-station-button"
-            href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20рядом"
-            target="_blank"
-            rel="noopener"
-          >
-            Ближайшая АЗС
-          </a>
-
           <div class="azs-map">
             <div class="map-loader" id="mapLoader">
               Загружаем карту...
@@ -285,6 +276,15 @@
               referrerpolicy="no-referrer-when-downgrade"
               title="АЗС Иртышнефтепродукт на карте"
             ></iframe>
+
+            <a
+              class="nearest-station-button"
+              href="https://yandex.ru/maps/?text=АЗС%20Иртышнефтепродукт%20рядом"
+              target="_blank"
+              rel="noopener"
+            >
+              Ближайшая АЗС
+            </a>
           </div>
 
           <div class="azs-list compact-azs-list">
@@ -323,34 +323,33 @@
 
         <section class="profile-edit-panel hidden" id="profileEditPanel">
           <button type="button" class="profile-back-button" id="profileEditBackButton">
-            Назад в профиль
+            ← Назад
           </button>
 
           <form class="profile-name-form" id="profileNameForm">
             <div class="profile-form-header">
               <strong>Изменить ФИО</strong>
-              <span>Эти данные будут отправлены в личный кабинет СНК.</span>
             </div>
 
             <div class="profile-name-grid">
               <label>
                 <span>Фамилия</span>
-                <input id="profileFamilyInput" type="text" autocomplete="family-name" />
+                <input id="profileFamilyInput" type="text" autocomplete="family-name" maxlength="100" />
               </label>
 
               <label>
                 <span>Имя</span>
-                <input id="profileNameInput" type="text" autocomplete="given-name" />
+                <input id="profileNameInput" type="text" autocomplete="given-name" maxlength="100" />
               </label>
 
               <label>
                 <span>Отчество</span>
-                <input id="profilePatronymicInput" type="text" />
+                <input id="profilePatronymicInput" type="text" autocomplete="additional-name" maxlength="100" />
               </label>
             </div>
 
             <button type="submit" id="profileNameSaveButton">Сохранить ФИО</button>
-            <p class="profile-message hidden" id="profileNameMessage"></p>
+            <p class="profile-message hidden" id="profileNameMessage" role="status" aria-live="polite"></p>
           </form>
         </section>
 
@@ -423,20 +422,20 @@
       </nav>
     </section>
 
-    <div class="qr-modal hidden" id="qrModal">
+    <div class="qr-modal hidden" id="qrModal" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
       <div class="qr-modal-content">
         <button type="button" class="qr-modal-close" id="qrModalClose" aria-label="Закрыть QR-код">
           Закрыть
         </button>
 
-        <p class="qr-modal-title">Покажите QR оператору</p>
+        <p class="qr-modal-title" id="qrModalTitle">Покажите QR оператору</p>
         <div class="qr-modal-box" id="qrModalBox"></div>
       </div>
     </div>
   </main>
 
   <script src="qrcode.min.js"></script>
-  <script src="api.js?v=ios26"></script>
-  <script src="app.js?v=ios26"></script>
+  <script src="api.js?v=ios31"></script>
+  <script src="app.js?v=ios31"></script>
 </body>
 </html>

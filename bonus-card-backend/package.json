@@ -5,7 +5,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/app.js && node --check src/services/snc.service.js && node --check src/controllers/snc.controller.js && node --check src/middleware/rate-limit.middleware.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "axios": "^1.18.0",

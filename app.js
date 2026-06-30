@@ -101,6 +101,16 @@ function unwrapApiData(result) {
   return result?.data?.data ?? result?.data ?? null;
 }
 
+function saveSessionTokens(tokens) {
+  if (!tokens?.accessToken || !tokens?.refreshToken) {
+    return false;
+  }
+
+  localStorage.setItem('accessToken', tokens.accessToken);
+  localStorage.setItem('refreshToken', tokens.refreshToken);
+  return true;
+}
+
 function parseRegistrationRequisites(result) {
   const data = unwrapApiData(result);
   const rawRequisites = data?.requisites?.requisiteValue || data?.requisites;
@@ -324,26 +334,34 @@ function renderTransactionItems(container, transactions) {
   container.innerHTML = '';
 
   if (!transactions.length) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <strong>Пока нет операций</strong>
-        <p>После первой покупки здесь появится история.</p>
-      </div>
-    `;
+    const emptyState = document.createElement('div');
+    const emptyTitle = document.createElement('strong');
+    const emptyText = document.createElement('p');
+
+    emptyState.className = 'empty-state';
+    emptyTitle.textContent = 'Пока нет операций';
+    emptyText.textContent = 'После первой покупки здесь появится история.';
+    emptyState.append(emptyTitle, emptyText);
+    container.appendChild(emptyState);
     return;
   }
 
   transactions.forEach(function (transaction) {
     const item = document.createElement('div');
-    item.className = 'transaction-item';
+    const main = document.createElement('div');
+    const title = document.createElement('strong');
+    const date = document.createElement('small');
+    const amount = document.createElement('span');
 
-    item.innerHTML = `
-      <div class="transaction-main">
-        <strong>${transaction.title}</strong>
-        <small>${transaction.displayDate || transaction.date}</small>
-      </div>
-      <span class="${transaction.type}">${transaction.amount}</span>
-    `;
+    item.className = 'transaction-item';
+    main.className = 'transaction-main';
+    title.textContent = transaction.title;
+    date.textContent = transaction.displayDate || transaction.date;
+    amount.className = transaction.type === 'minus' ? 'minus' : 'plus';
+    amount.textContent = transaction.amount;
+
+    main.append(title, date);
+    item.append(main, amount);
 
     container.appendChild(item);
   });
@@ -554,6 +572,10 @@ function getQrValue(qrResult, fallbackCardNumber) {
 function mapSncTransaction(transaction) {
   const bonusIn = Number(transaction.bonusIn || 0);
   const bonusOut = Number(transaction.bonusOut || 0);
+  const bonusChange = bonusOut > 0 ? -Math.abs(bonusOut) : bonusIn;
+  const amount = bonusChange > 0
+    ? `+${formatNumber(bonusChange)}`
+    : (bonusChange < 0 ? `-${formatNumber(Math.abs(bonusChange))}` : '0');
 
   return {
     rawDate: getDateInputValue(transaction.date),
@@ -561,8 +583,8 @@ function mapSncTransaction(transaction) {
     displayDate: formatFriendlyDate(transaction.date),
     place: formatStationName(transaction.nameAzs || transaction.division || 'АЗС'),
     title: transaction.resourceName || 'Операция по карте',
-    amount: bonusOut > 0 ? `-${formatNumber(bonusOut)}` : `+${formatNumber(bonusIn)}`,
-    type: bonusOut > 0 ? 'minus' : 'plus'
+    amount,
+    type: bonusChange < 0 ? 'minus' : 'plus'
   };
 }
 
@@ -761,11 +783,10 @@ loginForm.addEventListener('submit', async function (event) {
       return;
     }
 
-    const accessToken = result.data.accessToken;
-    const refreshToken = result.data.refreshToken;
-
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    if (!saveSessionTokens(result.data)) {
+      showLoginMessage('Сервер не вернул данные сессии. Попробуйте войти еще раз.');
+      return;
+    }
 
     await loadSncDashboard();
   } catch {
@@ -776,8 +797,19 @@ loginForm.addEventListener('submit', async function (event) {
   }
 });
 
-profileLogoutButton.addEventListener('click', function () {
-  showLogin();
+profileLogoutButton.addEventListener('click', async function () {
+  const accessToken = localStorage.getItem('accessToken');
+
+  profileLogoutButton.disabled = true;
+
+  try {
+    if (accessToken) {
+      await backendApi.logout(accessToken);
+    }
+  } finally {
+    profileLogoutButton.disabled = false;
+    showLogin();
+  }
 });
 
 if (profileEditOwnerButton) {
@@ -908,7 +940,7 @@ registerSmsButton.addEventListener('click', async function () {
     if (result.ok) {
       registerPhoneStep.classList.add('hidden');
       registerCodeStep.classList.remove('hidden');
-      showLoginMessage('SMS отправлено. Для теста используйте код 123456.');
+      showLoginMessage('SMS-код отправлен. Введите код из сообщения.');
       return;
     }
 
@@ -1011,8 +1043,11 @@ completeRegisterButton.addEventListener('click', async function () {
       return;
     }
 
-    localStorage.setItem('accessToken', loginResult.data.accessToken);
-    localStorage.setItem('refreshToken', loginResult.data.refreshToken);
+    if (!saveSessionTokens(loginResult.data)) {
+      showLoginMessage('Регистрация завершена, но сервер не вернул данные сессии. Войдите еще раз.');
+      return;
+    }
+
     pendingRegistration = null;
 
     await loadSncDashboard();
@@ -1062,9 +1097,7 @@ function showDashboardTab(target, shouldScroll = true) {
   localStorage.setItem('activeDashboardTab', target);
 
   if (isContacts && azsMapFrame && !azsMapFrame.src) {
-    setTimeout(function () {
-      azsMapFrame.src = azsMapFrame.dataset.src;
-    }, 100);
+    azsMapFrame.src = azsMapFrame.dataset.src;
   }
 
   if (shouldScroll) {

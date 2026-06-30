@@ -7,8 +7,14 @@ function notFoundHandler(req, res) {
 function errorHandler(error, req, res, next) {
   console.error(error);
 
-  res.status(error.status || 500).json({
-    error: error.message || 'Внутренняя ошибка сервера'
+  const status = Number.isInteger(error.status) && error.status >= 400 && error.status <= 599
+    ? error.status
+    : 500;
+
+  res.status(status).json({
+    error: status < 500 && error.message
+      ? error.message
+      : 'Внутренняя ошибка сервера'
   });
 }
 

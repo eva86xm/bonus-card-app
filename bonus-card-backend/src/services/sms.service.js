@@ -1,10 +1,11 @@
+const crypto = require('crypto');
 const sncService = require('./snc.service');
 
 const codesByPhone = new Map();
 
 function createCode(phone) {
   const normalizedPhone = sncService.normalizePhone(phone);
-  const code = process.env.DEV_AUTH_CODE || String(Math.floor(100000 + Math.random() * 900000));
+  const code = process.env.DEV_AUTH_CODE || String(crypto.randomInt(100000, 1000000));
 
   codesByPhone.set(normalizedPhone, {
     code,

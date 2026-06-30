@@ -11,6 +11,10 @@ async function ping(req, res, next) {
 }
 
 function getSafeStatus(status) {
+  if (status === 0) {
+    return 502;
+  }
+
   return Number.isInteger(status) && status >= 100 && status <= 599
     ? status
     : 500;
@@ -24,7 +28,7 @@ async function requestSms(req, res, next) {
   try {
     const { phone } = req.body;
 
-    if (!phone) {
+    if (sncService.normalizePhone(phone).length !== 11) {
       return res.status(400).json({ error: 'Укажите телефон' });
     }
 
@@ -39,7 +43,7 @@ async function registerCard(req, res, next) {
   try {
     const { phone } = req.body;
 
-    if (!phone) {
+    if (sncService.normalizePhone(phone).length !== 11) {
       return res.status(400).json({ error: 'Укажите телефон' });
     }
 
@@ -138,7 +142,7 @@ async function logout(req, res, next) {
 function getAccessToken(req) {
   const header = req.headers.authorization || '';
 
-  return header.replace('Bearer ', '').trim();
+  return header.replace(/^Bearer\s+/i, '').trim();
 }
 
 async function getUser(req, res, next) {
@@ -168,6 +172,10 @@ async function updateProfileName(req, res, next) {
 
     if (!familyPerson || !namePerson) {
       return res.status(400).json({ error: 'Укажите фамилию и имя' });
+    }
+
+    if ([familyPerson, namePerson, patronymicPerson].some((value) => String(value).trim().length > 100)) {
+      return res.status(400).json({ error: 'ФИО содержит слишком длинное значение' });
     }
 
     const result = await sncService.updateProfileName(accessToken, {

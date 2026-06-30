@@ -81,18 +81,22 @@ function renderAdminClients(clients = sncApi.clients) {
 
   clients.forEach(function (client) {
     const item = document.createElement('article');
-    item.className = 'admin-client';
+    const identity = document.createElement('div');
+    const card = document.createElement('div');
+    const name = document.createElement('strong');
+    const phone = document.createElement('p');
+    const cardNumber = document.createElement('strong');
+    const status = document.createElement('p');
 
-    item.innerHTML = `
-      <div>
-        <strong>${client.name}</strong>
-        <p>${client.phone}</p>
-      </div>
-      <div>
-        <strong>${client.cardNumber}</strong>
-        <p>${client.status}</p>
-      </div>
-    `;
+    item.className = 'admin-client';
+    name.textContent = client.name;
+    phone.textContent = client.phone;
+    cardNumber.textContent = client.cardNumber;
+    status.textContent = client.status;
+
+    identity.append(name, phone);
+    card.append(cardNumber, status);
+    item.append(identity, card);
 
     adminClientsList.appendChild(item);
   });

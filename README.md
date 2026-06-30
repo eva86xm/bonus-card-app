@@ -1,61 +1,33 @@
-# Bonus Card App
+# ИНП Card
 
-Прототип приложения для бонусных карт.
+Веб-приложение личного кабинета бонусной и топливной карты ИНП. Проект состоит из статического frontend и Node.js/Express backend, который безопасно проксирует запросы к API СНК.
 
-Проект состоит из двух частей:
+## Возможности
 
-- клиентская часть: простой личный кабинет бонусной карты
-- backend: сервер-прослойка для интеграции с API СНК
+- вход по номеру телефона и SMS-коду;
+- регистрация и заполнение данных владельца;
+- автоматическое обновление access-токена;
+- отображение карты, баланса и QR-кода;
+- история операций с фильтрами;
+- изменение ФИО владельца;
+- контакты и карта АЗС;
+- адаптивный интерфейс для iOS, Android и desktop.
 
-## Что уже есть
-
-### Клиентская часть
-
-- вход по номеру телефона
-- отображение бонусной карты
-- QR-код карты
-- баланс бонусов
-- доступно к списанию
-- история операций
-- отдельная админ-страница
-- привязка карты к телефону
-- поддержка телефонов через `7` и `8`
-
-### Backend
-
-Backend нужен, чтобы безопасно работать с API СНК.
-
-Через backend уже подключены маршруты:
-
-```text
-POST /api/snc/request-sms
-POST /api/snc/login
-POST /api/snc/refresh
-POST /api/snc/logout
-
-GET  /api/snc/user
-GET  /api/snc/owner
-GET  /api/snc/transactions
-GET  /api/snc/qr-code
-```
-
-## Структура проекта
+## Структура
 
 ```text
 bonus-card-app/
-  index.html
-  styles.css
-  app.js
-  api.js
-  admin.html
-  admin.js
+  index.html              клиентское приложение
+  styles.css              стили и адаптивность
+  app.js                  интерфейс и сценарии
+  api.js                  клиент backend API
+  admin.html / admin.js   локальная mock-админка
   logo.png
   qrcode.min.js
-  README.md
+  package.json            общие команды проверки
 
   bonus-card-backend/
-    .env
-    .gitignore
+    .env.example
     package.json
     src/
       server.js
@@ -65,237 +37,106 @@ bonus-card-app/
       services/
       middleware/
       storage/
+    test/
 ```
 
-## Запуск клиентской части
+## Локальный запуск
 
-Клиентская часть пока простая, без сборки.
-
-Можно открыть файл:
-
-```text
-index.html
-```
-
-в браузере.
-
-Для тестового входа в прототип используется номер:
-
-```text
-+7 900 111-22-33
-```
-
-## Запуск backend
-
-Перейти в папку backend:
+1. Создать `bonus-card-backend/.env` на основе `.env.example`.
+2. Установить зависимости backend:
 
 ```powershell
-cd C:\Users\Eva\Desktop\bonus-card-app\bonus-card-backend
+npm.cmd --prefix bonus-card-backend ci
 ```
 
-Запустить сервер:
+3. Запустить backend из корня проекта:
 
 ```powershell
-npm.cmd run dev
+npm.cmd run dev:backend
 ```
 
-Если все хорошо, появится:
+4. Во втором терминале запустить frontend:
 
-```text
-Bonus card backend is running on http://localhost:3000
+```powershell
+python -m http.server 8080
 ```
 
-Этот терминал нужно оставить открытым.
+5. Открыть [http://127.0.0.1:8080](http://127.0.0.1:8080).
 
-## Настройки backend
+## Проверки
 
-В папке:
-
-```text
-bonus-card-backend
+```powershell
+npm.cmd run check
+npm.cmd test
 ```
 
-должен быть файл `.env`.
+`check` проверяет синтаксис frontend и backend. `test` поднимает backend на случайном локальном порту и проверяет health, CORS, защитные заголовки, валидацию телефона и mock-поток SNC.
 
-Пример:
+Проверка уязвимостей зависимостей:
+
+```powershell
+npm.cmd --prefix bonus-card-backend audit --omit=dev
+```
+
+## Переменные окружения
+
+Для production необходимы как минимум:
 
 ```env
 PORT=3000
+HOST=127.0.0.1
+NODE_ENV=production
+CLIENT_ORIGIN=https://inpcard.ru
 SNC_API_URL=https://patest.sncard.ru
-SNC_API_KEY=your_api_key_here
+SNC_API_KEY=replace-with-production-key
+SNC_API_TIMEOUT_MS=15000
+TRUST_PROXY=1
+MOCK_MODE=false
 ```
 
-Файл `.env` нельзя выкладывать в GitHub, потому что там хранится ключ API.
+- `HOST=127.0.0.1` оставляет Node доступным только через Nginx.
+- `CLIENT_ORIGIN` может содержать несколько адресов через запятую.
+- `MOCK_MODE` в production принудительно отключён кодом.
+- `.env` и `node_modules` не должны попадать в Git.
 
-## Проверка backend
-
-Проверка, что сервер работает:
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/health" `
-  -Method GET `
-  -UseBasicParsing
-```
-
-Ожидаемый ответ:
-
-```json
-{"ok":true}
-```
-
-## Проверка связи с СНК
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/ping" `
-  -Method GET `
-  -UseBasicParsing
-```
-
-Если приходит ответ от СНК, значит backend видит сервер СНК.
-
-## Запрос SMS-кода
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/request-sms" `
-  -Method POST `
-  -ContentType "application/json" `
-  -Body '{"phone":"+7 999 888-77-66"}' `
-  -UseBasicParsing
-```
-
-Если номер не зарегистрирован в СНК, может прийти ответ:
+## Основные маршруты
 
 ```text
-Карта, активированная на указанный номер, отсутствует
+GET  /health
+
+POST /api/snc/request-sms
+POST /api/snc/login
+POST /api/snc/refresh
+POST /api/snc/logout
+
+POST /api/snc/register-card
+POST /api/snc/register-card/confirm
+POST /api/snc/register-complete
+
+GET  /api/snc/user
+GET  /api/snc/owner
+GET  /api/snc/transactions
+GET  /api/snc/qr-code
+PUT  /api/snc/profile/name
 ```
 
-Это нормальный ответ от СНК для несуществующего тестового номера.
+## Обновление сервера
 
-## Логин в СНК
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/login" `
-  -Method POST `
-  -ContentType "application/json" `
-  -Body '{"username":"79998887766","password":"123456"}' `
-  -UseBasicParsing
+```bash
+cd /var/www/bonus-card-app
+git pull --ff-only
+npm --prefix bonus-card-backend ci --omit=dev
+pm2 restart bonus-card-backend --update-env
+pm2 save
+curl http://127.0.0.1:3000/health
 ```
 
-Если логин или код неверные, СНК вернет ошибку:
+## Безопасность
 
-```text
-Неверный логин или пароль
-```
+- API-ключ СНК хранится только на backend.
+- API-ответы не кэшируются.
+- чувствительные маршруты ограничены по частоте запросов.
+- backend ограничивает размер JSON и время ожидания SNC.
+- пользовательские данные выводятся через `textContent`, без исполнения HTML.
 
-Для полноценной проверки нужен реальный тестовый номер и SMS-код от СНК.
-
-## Защищенные маршруты
-
-Эти маршруты работают только после входа, когда есть `accessToken`.
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/user" `
-  -Method GET `
-  -UseBasicParsing
-```
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/owner" `
-  -Method GET `
-  -UseBasicParsing
-```
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/transactions" `
-  -Method GET `
-  -UseBasicParsing
-```
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/qr-code" `
-  -Method GET `
-  -UseBasicParsing
-```
-
-Без входа ожидаемый ответ:
-
-```json
-{"error":"Нет accessToken"}
-```
-
-Это нормальное поведение.
-
-## Обновление токенов
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/refresh" `
-  -Method POST `
-  -ContentType "application/json" `
-  -Body '{}' `
-  -UseBasicParsing
-```
-
-Без `refreshToken` ожидаемый ответ:
-
-```json
-{"error":"Нет refreshToken"}
-```
-
-## Выход
-
-```powershell
-Invoke-WebRequest `
-  -Uri "http://localhost:3000/api/snc/logout" `
-  -Method POST `
-  -UseBasicParsing
-```
-
-Без `accessToken` ожидаемый ответ:
-
-```json
-{"error":"Нет accessToken"}
-```
-
-## Как работает авторизация СНК
-
-Общий сценарий такой:
-
-```text
-1. Клиент вводит телефон
-2. Backend отправляет запрос SMS в СНК
-3. СНК отправляет клиенту SMS-код
-4. Клиент вводит код
-5. Backend отправляет login в СНК
-6. СНК возвращает accessToken и refreshToken
-7. Backend использует accessToken для запросов данных карты
-8. Когда accessToken истекает, backend обновляет его через refreshToken
-```
-
-## Что нужно получить от СНК
-
-Для полноценной интеграции нужны:
-
-- рабочий `API Key`
-- тестовый сервер
-- тестовый номер телефона
-- тестовая карта
-- правила генерации QR-кода
-- описание, какие поля использовать для баланса и истории операций
-- подтверждение, какие сценарии нужны: только QR или еще регистрация, перевод бонусов, купоны, акции
-
-## Важно
-
-Сейчас проект находится на этапе MVP.
-
-Клиентская часть уже показывает прототип бонусной карты.
-
-Backend уже умеет обращаться к API СНК, но полноценная проверка возможна только после получения тестовых данных от СНК.
+Перед production-релизом необходимо заменить API-ключ, если он когда-либо попадал в историю Git. В следующей архитектурной версии рекомендуется перенести refresh-токен из `localStorage` в защищённую `HttpOnly Secure SameSite` cookie и использовать постоянное хранилище сессий.
